@@ -73,34 +73,42 @@ TASK_DEPENDENCY = Set Up Input Files eq Completed
 #------------------------------------------------------------------------------
 # Create input files and scripts, and submit jobs
 #------------------------------------------------------------------------------
-[Task.Submit Monthly Jobs]
+[Task.Run Yearly Jobs]
+NAME = Run Yearly Jobs
+DESCRIPTION = Outer loop to handle multi-year production runs
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+
+
+
+[Task.Run Yearly Jobs.Submit Monthly Jobs]
 NAME = Submit Monthly Jobs
 DESCRIPTION = Prepares input files and submits monthly jobs
 TASK_TYPE = LOOP
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
 
-[Task.Submit Monthly Jobs.Modify Namelist]
+[Task.Run Yearly Jobs.Submit Monthly Jobs.Modify Namelist]
 NAME = Modify Namelist
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_namelist.bash 
 TASK_DEPENDENCY = Regrid Files eq Completed
 
-[Task.Submit Monthly Jobs.Modify Metfields]
+[Task.Run Yearly Jobs.Submit Monthly Jobs.Modify Metfields]
 NAME = Modify Metfields
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_metfields.bash 
 TASK_DEPENDENCY = Modify Namelist eq Completed
 
-[Task.Submit Monthly Jobs.Create PBS Script]
+[Task.Run Yearly Jobs.Submit Monthly Jobs.Create PBS Script]
 NAME = Create PBS Script
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/create_pbs_script.bash 
 TASK_DEPENDENCY = Modify Metfields eq Completed
 
-[Task.Reset Date]
+[Task.Run Yearly Jobs.Reset Date]
 NAME = Reset Date 
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
@@ -110,20 +118,20 @@ TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 #------------------------------------------------------------------------------
 # Monitor Jobs
 #------------------------------------------------------------------------------
-[Task.Monitor Monthly Jobs]
+[Task.Run Yearly Jobs.Monitor Monthly Jobs]
 NAME = Monitor Monthly Jobs
 DESCRIPTION = Monitors monthly run segments 
 TASK_TYPE = LOOP
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
 
-[Task.Monitor Monthly Jobs.Watch Job]
+[Task.Run Yearly Jobs.Monitor Monthly Jobs.Watch Job]
 NAME = Watch Monthly Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
 TASK_DEPENDENCY = Reset Date eq Completed 
 
-[Task.Monitor Monthly Jobs.Archive Monthly Outputs Locally]
+[Task.Run Yearly Jobs.Monitor Monthly Jobs.Archive Monthly Outputs Locally]
 NAME = Archive Monthly Outputs Locally
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
@@ -161,4 +169,5 @@ NAME = Transfer Outputs to GMI Archive
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/transfer_output.bash
+TASK_DEPENDENCY
 TASK_DEPENDENCY = SUSPENDED
