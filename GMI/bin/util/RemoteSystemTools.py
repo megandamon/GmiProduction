@@ -14,6 +14,7 @@
 import os
 import sys
 import string
+import subprocess
 
 class RemoteSystemTools:
 
@@ -102,18 +103,31 @@ class RemoteSystemTools:
       systemCommand = "ssh " + nedUser + "@" + remoteSystem + " 'cd " + \
            remoteWorkingDir + ";" + qsubCommand + " " + remotePbsFile + "'"
 
-
       # start a process to submit the job to pbs
       # and collection the process output
-      subProcess = os.popen(systemCommand)
-      processOutput = subProcess.read()
-      closeReturn = subProcess.close ()
-      if closeReturn != None:
+      #subProcess = os.popen(systemCommand)
+      subProcess = subprocess.Popen(systemCommand, shell=True, 
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      cmdOut, cmdErr = subProcess.communicate()
+      # stdout has some junk chars before the jobId, so just split out the last word
+      jobString = cmdOut.split()[-1]
+      #processOutput = subProcess.read()
+      #closeReturn = subProcess.close ()
+      #if closeReturn != None:
+      if subProcess.returncode != 0:
          raise SSH_ERROR
-
-
+         
+      #wkEnvFileHandle = open (workflowEnvFile, 'a')
+      #wkEnvFileHandle.write ('#deBug*** qsub cmdOut: ' + cmdOut + '\n')
+      #wkEnvFileHandle.write ('#deBug*** qsub jobString: ' + jobString + '\n')
+      #wkEnvFileHandle.write ('#deBug*** qsub cmdErr: ' + cmdErr + '\n')
+      #wkEnvFileHandle.write ('#deBug*** systemCommand: ' + systemCommand + '\n')
+      #wkEnvFileHandle.write ('#deBug*** processOutput: ' + processOutput + '\n')
+      #wkEnvFileHandle.close ()
+      
       # create an entry for accounting
-      jobId = string.strip(processOutput)
+      #jobId = string.strip(processOutput)
+      jobId = string.strip(jobString)
       newEntry = jobId + ", " + realUser + "\n"
       
       # add job id to workflow env file

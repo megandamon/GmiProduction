@@ -24,7 +24,13 @@ set bd = `echo $sdate | cut -c5,6 `
 #if ($bm == 02 && $bc != 0) echo bc and bm
 
 @ bd = $bd + $incr
-@ bm = $bm
+
+# Use this to change 08 to 8
+#@ bm = $bm
+# Above gave errors for 08 or 09 so use this instead
+set bm = `(echo $bm | sed 's/0*//')`
+set by = `(echo $by | sed 's/0*//')`
+
 -again: 
 if ($bm == 1 | $bm == 3 | $bm == 5 | $bm == 7 | $bm == 8 | $bm == 10 | $bm == 12 ) then
    if ($bd > 31) then
