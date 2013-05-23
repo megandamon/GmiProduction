@@ -1,0 +1,164 @@
+[Workflow Architecture]
+NAME = GMI
+VERSION = 1.0.0
+CREATOR =
+CREATION_DATE = 
+DESCRIPTION =
+LOGGING_DIRECTORY = log
+OVERALL_STATUS = QUEUED
+
+
+###############################################################################
+#
+# Prepare the environment for running GMI
+#
+###############################################################################
+
+[Task.Prepare Environment]
+NAME = Prepare Environment
+TASK_TYPE = PARENT
+
+[Task.Prepare Environment.Set Up Workflow Environment]
+NAME = Setup Workflow Environment
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/GMI/bin/setup_wf_env.bash 
+TASK_DEPENDENCY = 
+
+[Task.Prepare Environment.Check SSH Keys]
+NAME = Check SSH Keys
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/check_ssh_keys.bash 
+TASK_DEPENDENCY = Set Up Workflow Environment eq Completed
+
+[Task.Prepare Environment.Set Up GMI Environment]
+NAME = Set Up GMI Environment
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/setup_gmi_env.bash 
+TASK_DEPENDENCY = Check SSH Keys eq Completed
+
+[Task.Prepare Environment.Compile GMI]
+NAME = Compile GMI
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT =$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/compile_gmi.bash 
+TASK_DEPENDENCY = Set Up GMI Environment eq Completed
+
+[Task.Prepare Environment.Prepare Installation]
+NAME = Prepare Installation
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/prepare_installation.bash 
+TASK_DEPENDENCY = Compile GMI eq Completed
+
+[Task.Prepare Environment.Set Up Input Files]
+NAME = Set Up Input Files
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/setup_input_files.bash 
+TASK_DEPENDENCY = Prepare Installation eq Completed
+
+[Task.Prepare Environment.Regrid Files]
+NAME = Regrid Files
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = ls -alF $NED_WORKING_DIR
+TASK_DEPENDENCY = Set Up Input Files eq Completed
+
+
+
+
+#------------------------------------------------------------------------------
+# Create input files and scripts, and submit jobs
+#------------------------------------------------------------------------------
+[Task.Submit Jobs]
+NAME = Submit Jobs
+DESCRIPTION = Prepares input files and submits jobs
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
+
+[Task.Submit Jobs.Modify Namelist]
+NAME = Modify Namelist
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_namelist.bash 
+TASK_DEPENDENCY = Regrid Files eq Completed
+
+[Task.Submit Jobs.Modify Metfields]
+NAME = Modify Metfields
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_metfields.bash 
+TASK_DEPENDENCY = Modify Namelist eq Completed
+
+[Task.Submit Jobs.Create PBS Script]
+NAME = Create PBS Script
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/create_pbs_script.bash 
+TASK_DEPENDENCY = Modify Metfields eq Completed
+
+[Task.Reset Date]
+NAME = Reset Date 
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting date for monitoring" >> $NED_WORKING_DIR/.exp_env.bash;echo "export CURRENT_DATE=" >> $NED_WORKING_DIR/.exp_env.bash
+TASK_DEPENDENCY = Submit Jobs eq Completed
+
+#------------------------------------------------------------------------------
+# Monitor Jobs
+#------------------------------------------------------------------------------
+[Task.Monitor Jobs]
+NAME = Monitor Jobs
+DESCRIPTION = Monitors run segments 
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
+
+[Task.Monitor Jobs.Watch Job]
+NAME = Watch Job
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
+TASK_DEPENDENCY = Reset Date eq Completed 
+
+[Task.Monitor Jobs.Archive Outputs]
+NAME = Archive Outputs
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/archive_outputs.bash
+TASK_DEPENDENCY = Watch Job eq Completed
+
+[Task.Monitor Jobs.Transfer Outputs]
+NAME = Transfer Outputs
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/transfer_output.bash
+TASK_DEPENDENCY = Archive Outputs eq Completed 
+
+
+#------------------------------------------------------------------------------
+# User Utilities
+#------------------------------------------------------------------------------
+
+[Task.User Utilities]
+NAME = User Utilities
+DESCRIPTION = 
+TASK_TYPE = PARENT
+
+[Task.User Utilities.Clean Environment]
+NAME = Clean Environment
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = sleep 2
+TASK_DEPENDENCY
+TASK_STATUS = SUSPENDED
+
+[Task.User Utilities.Kill Job]
+NAME = Kill Job
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = sleep 2
+TASK_DEPENDENCY
+TASK_STATUS = SUSPENDED

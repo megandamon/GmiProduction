@@ -1,0 +1,13 @@
+%manual
+  Calls run script to execute GEOS
+%end
+
+
+%include <head.h>
+
+msg="Killing current GMI job"
+smslabel Info "$msg"
+%include <.ned_env.h>
+%include <kill_job.h>
+
+%include <tail.h>

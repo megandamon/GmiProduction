@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export accountingFile=/Users/mrdamon/.accounting

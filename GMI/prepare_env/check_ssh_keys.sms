@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Check ssh keys to HPC and archive systems"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <check_ssh_keys.h>
+
+%include <tail.h>

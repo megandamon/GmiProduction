@@ -1,0 +1,92 @@
+set HOME $NED_WORKING_DIR
+set UNIQUEID $NED_UNIQUE_ID
+
+set SEGBEG $startSegment 
+set SEGEND $endSegment
+
+suite GMI
+
+   edit SMSHOME "$HOME" 
+   edit SMSINCLUDE "$HOME/$NED_UNIQUE_ID/include"
+   edit NED_USER $NED_USER
+   edit NED_WORKING_DIR $NED_WORKING_DIR
+   edit NED_UNIQUE_ID $NED_UNIQUE_ID
+   edit VIEWMSG "To view data run"
+
+   family prepare_env
+
+
+      task setup_wf_env 
+         label Info "Setup variables for workflow operations"
+   
+      task check_ssh_keys 
+         trigger setup_wf_env == complete
+         label Info "Check ssh setup"
+
+      task setup_gmi_env
+         trigger check_ssh_keys == complete
+         label Info "Set up GMI csh environment"
+
+      task compile_gmi
+         trigger setup_gmi_env == complete
+         label Info "Compile GMI code based on TAG"
+
+      task prepare_installation
+         trigger compile_gmi == complete
+         label Info "Copy executable or compile"
+
+      task setup_input_files
+         trigger prepare_installation == complete
+         label Info "Set up input and restart files"
+      
+      task regrid_files
+         trigger setup_input_files == complete
+         label Info "Regrid input files to required resolution"
+   
+   endfamily
+
+   family run_model 
+
+      trigger prepare_env == complete
+
+      repeat date DATE $SEGBEG $SEGEND 00000100
+ 
+      task modify_namelist 
+         label Info "Modify namelist for run segment"
+
+      task modify_metfields 
+         trigger modify_namelist ==  complete
+         label Info "Modify metfields list"
+      
+      task create_pbs_script
+         trigger modify_metfields ==  complete
+         label Info "Create new pbs script for segment"
+
+      task run_gmi_segment 
+         trigger create_pbs_script  ==  complete
+         label Running ""
+
+      task archive_outputs
+         trigger run_gmi_segment == complete
+         label Info "Archive run segment data"
+
+   endfamily
+
+   family user_utilities 
+
+      trigger /GMI/run_model eq complete 
+
+      task transfer_output
+         label Running "" 
+       
+      task clean_env 
+         defstatus suspended
+         label Info "Remote installation and outputs on HPC system" 
+
+      task kill_job
+        defstatus suspended
+        label Info "Resume task to kill PBS job"
+
+   endfamily
+
+endsuite

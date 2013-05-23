@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+echo ". $NED_WORKING_DIR/.exp_env.bash"
+. $NED_WORKING_DIR/.exp_env.bash
+. $ENV_FILE
+. $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ReturnMonth.bash
+
+echo "------------------------"
+echo "NED_USER: $NED_USER"
+echo "NED_WORKING_DIR: $NED_WORKING_DIR"
+echo "------------------------"
+echo ""
+
+echo "------------------------"
+echo "CURRENT_DATE = $CURRENT_DATE"
+
+if [ "$COMPILE" = "yes" ]; then
+   echo "GMI executable selected from compilation"
+   echo "This feature is currently not supported"
+   echo "------------------------"
+   exit -1
+fi
+
+for jobID in `cat $NED_WORKING_DIR/.exp_env.bash | grep jobID | grep -v 0000 | sed -e "s/export jobID=//g"`; 
+do
+echo $jobID
+done
+

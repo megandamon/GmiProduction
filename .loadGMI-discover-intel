@@ -1,0 +1,13 @@
+module purge
+module load comp/intel-9.1.052
+module load mpi/impi-3.1.038
+
+setenv ARCHITECTURE ARCH_INTEL
+
+if (-e ~/.cshrc.gmi) then
+   source ~/.cshrc.gmi
+endif
+
+if (-e ~/.login.gmi) then
+   source ~/.login.gmi
+endif

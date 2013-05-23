@@ -1,0 +1,12 @@
+%include <head.h>
+
+msg="date %DATE%"
+smslabel Running "$msg"
+
+THE_DATE=%DATE%
+export CURRENT_DATE=$THE_DATE
+
+%include <.ned_env.h>
+%include <run_gmi_segment.h>
+
+%include <tail.h>

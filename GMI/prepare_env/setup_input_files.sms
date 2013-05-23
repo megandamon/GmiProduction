@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Copy or link needed input or restart files for simulation"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <setup_input_files.h>
+
+%include <tail.h>

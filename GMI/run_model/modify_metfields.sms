@@ -1,0 +1,9 @@
+%include <head.h>
+
+THE_DATE=%DATE%
+export CURRENT_DATE=$THE_DATE
+
+%include <.ned_env.h>
+%include <modify_metfields.h>
+
+%include <tail.h>
