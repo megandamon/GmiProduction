@@ -73,27 +73,27 @@ TASK_DEPENDENCY = Set Up Input Files eq Completed
 #------------------------------------------------------------------------------
 # Create input files and scripts, and submit jobs
 #------------------------------------------------------------------------------
-[Task.Submit Jobs]
-NAME = Submit Jobs
-DESCRIPTION = Prepares input files and submits jobs
+[Task.Submit Monthly Jobs]
+NAME = Submit Monthly Jobs
+DESCRIPTION = Prepares input files and submits monthly jobs
 TASK_TYPE = LOOP
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
 
-[Task.Submit Jobs.Modify Namelist]
+[Task.Submit Monthly Jobs.Modify Namelist]
 NAME = Modify Namelist
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_namelist.bash 
 TASK_DEPENDENCY = Regrid Files eq Completed
 
-[Task.Submit Jobs.Modify Metfields]
+[Task.Submit Monthly Jobs.Modify Metfields]
 NAME = Modify Metfields
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/modify_metfields.bash 
 TASK_DEPENDENCY = Modify Namelist eq Completed
 
-[Task.Submit Jobs.Create PBS Script]
+[Task.Submit Monthly Jobs.Create PBS Script]
 NAME = Create PBS Script
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
@@ -105,37 +105,30 @@ NAME = Reset Date
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting date for monitoring" >> $NED_WORKING_DIR/.exp_env.bash;echo "export CURRENT_DATE=" >> $NED_WORKING_DIR/.exp_env.bash
-TASK_DEPENDENCY = Submit Jobs eq Completed
+TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 
 #------------------------------------------------------------------------------
 # Monitor Jobs
 #------------------------------------------------------------------------------
-[Task.Monitor Jobs]
-NAME = Monitor Jobs
-DESCRIPTION = Monitors run segments 
+[Task.Monitor Monthly Jobs]
+NAME = Monitor Monthly Jobs
+DESCRIPTION = Monitors monthly run segments 
 TASK_TYPE = LOOP
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
 
-[Task.Monitor Jobs.Watch Job]
-NAME = Watch Job
+[Task.Monitor Monthly Jobs.Watch Job]
+NAME = Watch Monthly Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
 TASK_DEPENDENCY = Reset Date eq Completed 
 
-[Task.Monitor Jobs.Archive Outputs]
-NAME = Archive Outputs
+[Task.Monitor Monthly Jobs.Archive Monthly Outputs Locally]
+NAME = Archive Monthly Outputs Locally
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/archive_outputs.bash
 TASK_DEPENDENCY = Watch Job eq Completed
-
-[Task.Monitor Jobs.Transfer Outputs]
-NAME = Transfer Outputs
-DESCRIPTION = 
-TASK_TYPE = SYSTEM
-EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/transfer_output.bash
-TASK_DEPENDENCY = Archive Outputs eq Completed 
 
 
 #------------------------------------------------------------------------------
@@ -162,3 +155,10 @@ TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = sleep 2
 TASK_DEPENDENCY
 TASK_STATUS = SUSPENDED
+
+[Task.User Utilities.Transfer Outputs to GMI Archive]
+NAME = Transfer Outputs to GMI Archive
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/transfer_output.bash
+TASK_DEPENDENCY = SUSPENDED
