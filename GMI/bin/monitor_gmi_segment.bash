@@ -122,8 +122,6 @@ keyWordLength=${#successKeyWord}
 if [ $numberOfEmpty -gt 4 ] && [ "$status" = "" ]; then
 
     echo "Attempting to get standard out/error file"
-    echo "$SSH_PATH $NED_USER@$MACH mv -f $standardOutFile $WORK_DIR"
-    $SSH_PATH $NED_USER@$MACH mv -f $standardOutFile $WORK_DIR
     echo "$SSH_PATH $NED_USER@$MACH tail -n 100 $WORK_DIR/$standardOutFile | grep \"${successKeyWord}\""
     outputCheck=`$SSH_PATH $NED_USER@$MACH tail -n 100 $WORK_DIR/$standardOutFile | grep "${successKeyWord}"`
 

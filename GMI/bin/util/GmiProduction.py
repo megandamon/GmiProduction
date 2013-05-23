@@ -312,6 +312,8 @@ class GmiProduction:
 
    def copyOutputDataToTempArchive (self, remoteSystem):
 
+      print "top of copyOutputData"
+      
       if len (self.nameListName) <= 0:
          raise self.exceptions.BADOBJECTDATA
          return
@@ -330,14 +332,15 @@ class GmiProduction:
 
       if len (self.base) <= 0:
          self.base = self.nameListName[0:len(self.nameListName)-len('.in')]
-
+      
       # "completed/YYYY" directory
       self.storageDirectory = self.runDirectory + "/completed" + "/" + self.year
       if len (remoteSystem) == 0:
          self.automationObject.createDirectoryStructure (self.storageDirectory)
       else:
-         systemCommand = "ssh mrdamon@" + remoteSystem + " mkdir -p " + \
+         systemCommand = "ssh " + remoteSystem + " mkdir -p " + \
              self.storageDirectory
+         print systemCommand
          os.system (systemCommand)
                     
       # "run_info/PET"

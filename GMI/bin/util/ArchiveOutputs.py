@@ -63,10 +63,11 @@ productionObject.queueId = optList[4][1]
 productionObject.userName = optList[6][1]
 theDate = optList[1][1]
 productionObject.year = theDate[0:4]
-print "Archving job with id: ", productionObject.queueId
+print "Archving job with id LALA: ", productionObject.queueId
 
 print optList[0][1]
 
+print "Before copyOutputDataToTempArchive"
 productionObject.copyOutputDataToTempArchive (optList[0][1])
 
                                  
