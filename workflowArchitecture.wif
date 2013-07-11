@@ -79,6 +79,12 @@ DESCRIPTION = Outer loop to handle multi-year production runs
 TASK_TYPE = LOOP
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
 
+[Task.Run Yearly Jobs.Print Things]
+NAME = Print Things
+DESCRIPTION = Prints things
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = echo GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS; echo GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+TASK_DEPENDENCY = Regrid Files eq Completed
 
 
 [Task.Run Yearly Jobs.Submit Monthly Jobs]
@@ -105,6 +111,7 @@ TASK_DEPENDENCY = Modify Namelist eq Completed
 NAME = Create PBS Script
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
+#EXECUTABLE_OBJECT = echo "Create PBS script holder"
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/create_pbs_script.bash 
 TASK_DEPENDENCY = Modify Metfields eq Completed
 
@@ -128,6 +135,7 @@ ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMIT
 NAME = Watch Monthly Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
+#EXECUTABLE_OBJECT = echo "Watch job place holder"
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
 TASK_DEPENDENCY = Reset Date eq Completed 
 
@@ -135,6 +143,7 @@ TASK_DEPENDENCY = Reset Date eq Completed
 NAME = Archive Monthly Outputs Locally
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
+#EXECUTABLE_OBJECT = echo "Archive job place holder"
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/archive_outputs.bash
 TASK_DEPENDENCY = Watch Job eq Completed
 

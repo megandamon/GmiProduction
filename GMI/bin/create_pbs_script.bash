@@ -46,7 +46,7 @@ else
     exit -1
 fi
 
-if [ "$CURRENT_DATE" == "$START_DATE" ]; then
+if [ "$CURRENT_DATE" == "$START_DATE" ] || [ "$currentMonth" == "jan" ]; then
    echo "current date is start date"
    echo "export jobID=0000" >> $NED_WORKING_DIR/.exp_env.bash
    . $NED_WORKING_DIR/.exp_env.bash

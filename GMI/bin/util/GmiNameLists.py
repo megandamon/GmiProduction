@@ -122,6 +122,12 @@ class GmiNameLists:
       startmonth = self.startMonth
       startyear = self.startYear 
       
+      matchBcToYear = bool(0)
+      matchSadToYear = bool(0)
+      matchEmissToYear = bool(0)
+      matchAerToYear = bool(0)
+      matchLightToYear = bool(0)
+      
       #---------------------------------------------------------------------------  
       # Begin Gary Wojcik section
       # Modified by Megan Damon 3/20/2008
@@ -130,6 +136,27 @@ class GmiNameLists:
       daysPerMonth=[31,28,31,30,31,30,31,31,30,31,30,31]
       monthNames=['jan', 'feb','mar','apr','may','jun','jul',\
                  'aug','sep','oct','nov', 'dec']
+      
+      ioObject = IoRoutines ()
+      fileLines = ioObject.readFile (self.envFile)
+      for line in fileLines:
+          if re.search ('MATCH', line):
+              splitString = line.split("=") 
+              options = splitString[0].split(" ")
+              option = options[1]
+              print option
+              if option == "MATCH_BC_TO_YEAR":
+                matchBcToYear = bool(1)
+              elif option == "MATCH_SAD_TO_YEAR":
+                matchSadToYear = bool(1)
+              elif option == "MATCH_EMISS_TO_YEAR":
+                matchEmissToYear = bool(1)
+              elif option == "MATCH_AERDUST_TO_YEAR":
+                matchAerToYear = bool(1)
+              elif option == "MATCH_LIGHT_TO_YEAR":
+                matchLightToYear = bool(1)
+              else:
+                print "I don't understand this option and this could be a problem."
 
       # read the starting namelist file
       infil='%s/%s' % (pathToNameList, namelistfile)
@@ -274,9 +301,13 @@ class GmiNameLists:
 
             keyWord = splitLine[0]
             splitKeyWord = re.split(splitter, keyWord) 
+            
             keyWord = splitKeyWord[0] 
-
             print "keyWord: ", keyWord
+            
+            if len(splitLine) == 2:
+                value = splitLine[1]
+                print "value: ", value
 
 
             if keyWord == 'problem_name':
@@ -332,9 +363,35 @@ class GmiNameLists:
                    self.replaceRestartFile != 0:
                ofil.write('restart_infile_name' + splitter + restartFileName + endLine)
 
-            elif keyWord == 'forc_bc_start_num':
+            elif keyWord == 'forc_bc_start_num' and \
+                matchBcToYear == True:
                ofil.write('forc_bc_start_num' + splitter + str(int(startymd[0:4]) - 1969) + endLine)
-               
+
+            elif keyWord == 'lightYearDim' and \
+                matchLightToYear == True:
+               ofil.write('lightYearDim' + splitter + str(int(startymd[0:4]) - 1989) + endLine)
+            
+            elif keyWord == 'lbssad_infile_name' and \
+                matchSadToYear == True:
+               splitLbssad = re.split("_", value) 
+               newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + endymd[0:4] + ".nc"
+               ofil.write('lbssad_infile_name' + splitter + newLbssad + endLine)   
+
+            elif keyWord == 'emiss_infile_name' and \
+                matchEmissToYear == True:
+               splitEmiss = re.split("_", value) 
+               newEmiss = splitEmiss[0] + "_" + endymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
+               print "newEmiss: ", newEmiss
+               ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)   
+
+            elif keyWord == 'AerDust_infile_name' and \
+                matchAerToYear == True:
+               splitAer = re.split("_", value) 
+               newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + endymd[0:4] + "_" + splitAer[4]
+               print "newAer: ", newAer
+               ofil.write('AerDust_infile_name' + splitter + newAer + endLine)   
+
+            
             elif keyWord == 'begGmiDate':
                ofil.write('begGmiDate' + splitter + currentYear + strmonthId \
                              + '01'  + endLine)
@@ -353,7 +410,7 @@ class GmiNameLists:
             
             elif keyWord == 'rd_restart' and \
                    self.replaceRestartFile != 0:
-               ofil.write('rd_restart' + splitter + 'T' + endLine)
+               ofil.write('rd_restart' + splitter + 'T' + endLine) 
 
             else:
                data=inline.replace('\r','') #Removes ^M character from strings written
@@ -368,7 +425,7 @@ class GmiNameLists:
             currentYear = str (intYear + 1)
             monthId = 0
          
-      ioObject = IoRoutines ()
+      
       ioObject.writeToFile (listOfNamelists,pathToNameList+"/namelists.list")
 
 
