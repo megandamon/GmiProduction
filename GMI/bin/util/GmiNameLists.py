@@ -122,11 +122,7 @@ class GmiNameLists:
       startmonth = self.startMonth
       startyear = self.startYear 
       
-      matchBcToYear = bool(0)
-      matchSadToYear = bool(0)
-      matchEmissToYear = bool(0)
-      matchAerToYear = bool(0)
-      matchLightToYear = bool(0)
+
       
       #---------------------------------------------------------------------------  
       # Begin Gary Wojcik section
@@ -144,19 +140,39 @@ class GmiNameLists:
               splitString = line.split("=") 
               options = splitString[0].split(" ")
               option = options[1]
-              print option
+              value = splitString[1]
+              
               if option == "MATCH_BC_TO_YEAR":
-                matchBcToYear = bool(1)
+                  matchBcToYear = bool(1)
+                  if value == "F":
+                      matchBcToYear = bool(0)     
+                       
               elif option == "MATCH_SAD_TO_YEAR":
-                matchSadToYear = bool(1)
+                  matchSadToYear = bool(1)
+                  if value == "F":
+                      matchSadToYear = bool(0)
+                      
               elif option == "MATCH_EMISS_TO_YEAR":
-                matchEmissToYear = bool(1)
+                  matchEmissToYear = bool(1)
+                  if value == "F":
+                      matchEmissToYear = bool(0)
+                      
               elif option == "MATCH_AERDUST_TO_YEAR":
-                matchAerToYear = bool(1)
+                  matchAerToYear = bool(1)
+                  if value == "F":
+                      matchAerToYear = bool(0)
+                    
               elif option == "MATCH_LIGHT_TO_YEAR":
-                matchLightToYear = bool(1)
+                  matchLightToYear = bool(1)
+                  if value == "F":
+                      matchLightToYear = bool(0)
+                    
               else:
                 print "I don't understand this option and this could be a problem."
+                
+                
+
+      print" done reading loop"
 
       # read the starting namelist file
       infil='%s/%s' % (pathToNameList, namelistfile)
