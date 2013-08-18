@@ -71,6 +71,12 @@ cd $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/
 
 echo "$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/./MakeNameLists.py -p $NED_WORKING_DIR  -n  base.in -d $CURRENT_DATE -r $replaceRestart -z \".\" -e $END_DATE -f $useFortranNameList -s $gmi_sec -v  $NED_WORKING_DIR/.exp_env.bash"
 $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/./MakeNameLists.py -p $NED_WORKING_DIR  -n  base.in -d $CURRENT_DATE -r $replaceRestart -z "." -e $END_DATE -f $useFortranNameList  -s $gmi_sec -v  $NED_WORKING_DIR/.exp_env.bash
+if [ "$?" != "0" ]; then
+    echo "There was a problem making the namelist file for $currentMonth $currentYear"
+    echo "Check the related log file!"
+    echo "------------------------"
+    exit -1
+fi
 
 export currentYear=${CURRENT_DATE:0:4}
 export numMonth=${CURRENT_DATE:4:2}

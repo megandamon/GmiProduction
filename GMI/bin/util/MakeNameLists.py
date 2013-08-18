@@ -94,4 +94,7 @@ nameListObject.gmiSeconds = gmiSeconds
 nameListObject.envFile = envFile
 print "replaceRestartFile: ", nameListObject.replaceRestartFile
 
-nameListObject.makeNameLists ()
+returnCode = nameListObject.makeNameLists ()
+print "returnCode from makeNameLists: ", returnCode
+
+sys.exit(returnCode)

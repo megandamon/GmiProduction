@@ -136,11 +136,15 @@ class GmiNameLists:
       ioObject = IoRoutines ()
       fileLines = ioObject.readFile (self.envFile)
       for line in fileLines:
+          
           if re.search ('MATCH', line):
+              
               splitString = line.split("=") 
               options = splitString[0].split(" ")
               option = options[1]
               value = splitString[1]
+              
+              print "Found MATCH LINE: ", option, value
               
               if option == "MATCH_BC_TO_YEAR":
                   matchBcToYear = bool(1)
@@ -166,9 +170,27 @@ class GmiNameLists:
                   matchLightToYear = bool(1)
                   if value == "F":
                       matchLightToYear = bool(0)
-                    
               else:
-                print "I don't understand this option and this could be a problem."
+                print "I don't understand this MATCH option and this could be a problem."
+            
+          elif re.search ('INITIAL', line):
+              
+              splitString = line.split("=") 
+              options = splitString[0].split(" ")
+              option = options[1]
+              value = splitString[1]
+              
+              print "Found INITIAL LINE: ", option, value
+              
+              if option == "INITIAL_YEAR_FORC_BC":
+                  initialYearForcBc = value
+              
+              elif option == "INITIAL_YEAR_LIGHT":
+                  initialYearLight = value
+            
+              else:
+                  print "I don't understand this INITIAL option and this could be a problme"
+            
                 
                 
 
@@ -200,7 +222,7 @@ class GmiNameLists:
 
       if foundIt != 0:
          print "Problem finding the problem_name.  Check the namelist"
-         sys.exit (0)
+         sys.exit (-1)
 
       splitProblemName=origproblemname.split("_")
       counter = 0
@@ -377,35 +399,53 @@ class GmiNameLists:
 
             elif keyWord == 'restart_infile_name' and \
                    self.replaceRestartFile != 0:
+               print "changing restart!" 
                ofil.write('restart_infile_name' + splitter + restartFileName + endLine)
 
             elif keyWord == 'forc_bc_start_num' and \
-                matchBcToYear == True:
-               ofil.write('forc_bc_start_num' + splitter + str(int(startymd[0:4]) - 1969) + endLine)
+                    matchBcToYear == True:
+                forcBcStartNum = int(startymd[0:4]) - int(initialYearForcBc)
+                
+                if forcBcStartNum < 0: 
+                    print "forcBcStartNum cannot be less than 0!"
+                    sys.exit (-1)
+                    
+                print "forcBcStartNum: ", forcBcStartNum
+                ofil.write('forc_bc_start_num' + splitter + str(forcBcStartNum) + endLine)
+                #ofil.write('forc_bc_start_num' + splitter + str(int(startymd[0:4]) - 1949) + endLine)
 
             elif keyWord == 'lightYearDim' and \
-                matchLightToYear == True:
-               ofil.write('lightYearDim' + splitter + str(int(startymd[0:4]) - 1989) + endLine)
+                    matchLightToYear == True:
+                lightYearStartNum = int(startymd[0:4]) - int(initialYearLight)
+                
+                if lightYearStartNum < 0: 
+                    print "lightYearStartNum cannot be less than 0!"
+                    sys.exit (-1)
+                
+                print "lightYearStartNum: ", lightYearStartNum
+                ofil.write('lightYearDim' + splitter + str(lightYearStartNum) + endLine)
+                #ofil.write('lightYearDim' + splitter + str(int(startymd[0:4]) - 1989) + endLine)
             
             elif keyWord == 'lbssad_infile_name' and \
-                matchSadToYear == True:
-               splitLbssad = re.split("_", value) 
-               newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + endymd[0:4] + ".nc"
-               ofil.write('lbssad_infile_name' + splitter + newLbssad + endLine)   
+                    matchSadToYear == True:
+                print "changing lbssad"
+                splitLbssad = re.split("_", value) 
+                newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + endymd[0:4] + ".nc"
+                ofil.write('lbssad_infile_name' + splitter + newLbssad + endLine)   
 
             elif keyWord == 'emiss_infile_name' and \
-                matchEmissToYear == True:
-               splitEmiss = re.split("_", value) 
-               newEmiss = splitEmiss[0] + "_" + endymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
-               print "newEmiss: ", newEmiss
-               ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)   
+                    matchEmissToYear == True:
+                splitEmiss = re.split("_", value) 
+                newEmiss = splitEmiss[0] + "_" + endymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
+                print "newEmiss: ", newEmiss
+                ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)   
 
             elif keyWord == 'AerDust_infile_name' and \
-                matchAerToYear == True:
-               splitAer = re.split("_", value) 
-               newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + endymd[0:4] + "_" + splitAer[4]
-               print "newAer: ", newAer
-               ofil.write('AerDust_infile_name' + splitter + newAer + endLine)   
+                    matchAerToYear == True:
+                splitAer = re.split("_", value) 
+                newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + endymd[0:4] + "_" + splitAer[4]
+                print "newAer: ", newAer
+                ofil.write('AerDust_infile_name' + splitter + newAer + endLine)   
 
             
             elif keyWord == 'begGmiDate':
