@@ -139,20 +139,12 @@ TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
 TASK_DEPENDENCY = Reset Date eq Completed 
 
-[Task.Run Yearly Jobs.Monitor Monthly Jobs.Archive Monthly Outputs Locally]
-NAME = Archive Monthly Outputs Locally
-DESCRIPTION = 
-TASK_TYPE = SYSTEM
-#EXECUTABLE_OBJECT = echo "Archive job place holder"
-EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/archive_outputs.bash
-TASK_DEPENDENCY = Watch Job eq Completed
-
 [Task.Run Yearly Jobs.Reset Job ID
 NAME = Reset Job ID 
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting job ID at end of the year" >> $NED_WORKING_DIR/.exp_env.bash;echo "export jobID=0000" >> $NED_WORKING_DIR/.exp_env.bash
-TASK_DEPENDENCY = Monitor Monthly Jobs eq Completed
+TASK_DEPENDENCY = Watch Job eq Completed
 
 
 

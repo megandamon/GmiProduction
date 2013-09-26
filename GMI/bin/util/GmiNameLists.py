@@ -293,11 +293,12 @@ class GmiNameLists:
             endymd = currentYear[0:4] + strmonthId + str(daysPerMonth[monthId])
             endymd = autoTool.incrementDate (endymd)
             if endymd[4:8] == "0229":
-		newendymd = endymd[0:4]+"0301"
-	        endymd = newendymd
-            startymd = currentYear[0:4] + strmonthId + '01'
+                newendymd = endymd[0:4]+"0301"
+                endymd = newendymd
+            
+         startymd = currentYear[0:4] + strmonthId + '01'
 
-         print "endyd: ", endymd
+         print "endymd: ", endymd
 
          problemName1 = splitProblemName[0].strip()
          problemName2 = splitProblemName[1].strip()
@@ -430,20 +431,20 @@ class GmiNameLists:
                     matchSadToYear == True:
                 print "changing lbssad"
                 splitLbssad = re.split("_", value) 
-                newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + endymd[0:4] + ".nc"
+                newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + startymd[0:4] + ".nc"
                 ofil.write('lbssad_infile_name' + splitter + newLbssad + endLine)   
 
             elif keyWord == 'emiss_infile_name' and \
                     matchEmissToYear == True:
                 splitEmiss = re.split("_", value) 
-                newEmiss = splitEmiss[0] + "_" + endymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
+                newEmiss = splitEmiss[0] + "_" + startymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
                 print "newEmiss: ", newEmiss
                 ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)   
 
             elif keyWord == 'AerDust_infile_name' and \
                     matchAerToYear == True:
                 splitAer = re.split("_", value) 
-                newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + endymd[0:4] + "_" + splitAer[4]
+                newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + startymd[0:4] + "_" + splitAer[4]
                 print "newAer: ", newAer
                 ofil.write('AerDust_infile_name' + splitter + newAer + endLine)   
 
