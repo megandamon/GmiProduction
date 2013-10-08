@@ -1,0 +1,23 @@
+#PBS -S /usr/local/bin/csh
+#PBS -N aura4
+#PBS -q general
+#PBS -l select=34:ncpus=4
+#PBS -l walltime=7:00:00
+#PBS -W group_list=k3002
+#PBS -W depend=afterok:0000
+#PBS -j eo 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 
+
+setenv CHEMCASE strat_trop
+
+cd $workDir
+
+setenv BASEDIR /discover/nobackup/projects/gmao/share/dao_ops/Baselibs/v3.2.0_buildSLES11
+
+cp namelist.list gmiResourceFile.rc
+limit stacksize unlimited
+$GEMHOME/./gmi.x | tee stdout.log
+
+cp stdout.log gmi0000.erun 

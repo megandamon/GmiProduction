@@ -1,4 +1,4 @@
-#!/bin/bash -xv
+#!/bin/bash
 
 
 . $NED_WORKING_DIR/.exp_env.bash

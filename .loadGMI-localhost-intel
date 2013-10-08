@@ -1,0 +1,9 @@
+setenv ARCHITECTURE ARCH_INTEL
+
+if (-e ~/.cshrc.gmi) then
+   source ~/.cshrc.gmi
+endif
+
+if (-e ~/.login.gmi) then
+   source ~/.login.gmi
+endif

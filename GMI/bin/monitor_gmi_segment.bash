@@ -44,9 +44,11 @@ export status=""
 let numberOfEmpty=0
 export jobId=$jobId
 
-let maxSeconds=432000
+#let maxSeconds=432000
+let maxSeconds=$MAX_MONITORING_SECONDS
 let numSeconds=0
-let sleepTime=45
+#let sleepTime=45
+let sleepTime=$SLEEP_SECONDS
 
 echo -e "\nmaxSeconds: $maxSeconds"
 echo "numSeconds: $numSeconds"
@@ -83,7 +85,7 @@ while [ $numSeconds -lt $maxSeconds ]; do
     #--------------------------------------------------------------------------
     while [ $counter -lt 5 ]; do
 
-       sleep 30
+       sleep $sleepTime
 
        echo -e "\nssh $NED_USER@$MACH $QSTAT | grep ${jobId}"
        status=`ssh $NED_USER@$MACH $QSTAT | grep ${jobId}`
@@ -110,7 +112,7 @@ while [ $numSeconds -lt $maxSeconds ]; do
 done
 
 
-sleep 60
+sleep $sleepTime
 
 #---------------------------------------------------------------------------
 # check standard output/error file

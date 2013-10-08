@@ -1,0 +1,35 @@
+#PBS -S /usr/local/bin/csh
+#PBS -N aura4
+#PBS -q general
+#PBS -l select=34:ncpus=4
+#PBS -l walltime=7:00:00
+#PBS -W group_list=k3002
+#PBS -W depend=afterok:0000
+#PBS -j eo 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 
+
+setenv CHEMCASE strat_trop
+
+setenv MPI_USE_XPMEM
+setenv MPI_BUFFER_MAX 2000
+setenv MPI_TYPE_MAX   655360
+setenv MPI_MSGS_MAX   10485760
+setenv MPI_GROUP_MAX 128
+
+cd $workDir
+
+module purge
+module load comp/intel-11.0.083
+module load mpi/impi-3.2.2.006
+module load lib/mkl-10.0.3.020
+module load other/comp/gcc-4.5
+module load other/SIVO-PyD/spd_1.1.2
+
+setenv BASEDIR /discover/nobackup/projects/gmao/share/dao_ops/Baselibs/v3.2.0_buildSLES11
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:$BASEDIR/Linux/lib
+
+cp namelist.list gmiResourceFile.rc
+limit stacksize unlimited
+time mpirun 

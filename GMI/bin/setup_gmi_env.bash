@@ -1,4 +1,4 @@
-#!/bin/bash -xv
+#!/bin/bash
 
 . $NED_WORKING_DIR/.exp_env.bash
 . $ENV_FILE
@@ -18,10 +18,10 @@ echo ".login.gmi"
 
 if [ "$MPI_TYPE" == "intel" ]; then
     gmiEnvFile="$NED_WORKING_DIR/.loadGMI-$MACH-intel"
-    runRefFile="$NED_WORKING_DIR/run_ref_intel"
+    runRefFile="$NED_WORKING_DIR/run_ref_intel_$MACH"
 elif [ "$MPI_TYPE" == "scali" ]; then
     gmiEnvFile="$NED_WORKING_DIR/.loadGMI-$MACH-scali"
-    runRefFile="$NED_WORKING_DIR/run_ref_scali"
+    runRefFile="$NED_WORKING_DIR/run_ref_scali_$MACH"
 else
     echo "The MPI type: ", $MPI_TYPE, " is not supported"
     echo "----------------------------"
@@ -46,7 +46,7 @@ echo "After SCP"
 echo "#Path on remote system to the GMI env file" >> $NED_WORKING_DIR/.exp_env.bash
 echo "export GMI_ENV=$WORK_DIR/.loadGMI-$MACH-$MPI_TYPE" >>  $NED_WORKING_DIR/.exp_env.bash 
 echo "#Run reference file" >>  $NED_WORKING_DIR/.exp_env.bash
-echo "export RUN_REF=$NED_WORKING_DIR/run_ref_$MPI_TYPE" >> $NED_WORKING_DIR/.exp_env.bash
+echo "export RUN_REF=$NED_WORKING_DIR/run_ref_${MPI_TYPE}_${MACH}" >> $NED_WORKING_DIR/.exp_env.bash
 
 echo "$SCP_PATH $NED_WORKING_DIR/.cshrc.gmi-$MACH $NED_USER@$MACH:"
 $SCP_PATH $NED_WORKING_DIR/.cshrc.gmi-$MACH $NED_USER@$MACH:
@@ -58,6 +58,7 @@ if [ "$?" != "0" ]; then
      exit -1
 fi
 
+echo "$SCP_PATH $NED_WORKING_DIR/.login.gmi-$MACH $NED_USER@$MACH:"
 $SCP_PATH $NED_WORKING_DIR/.login.gmi-$MACH $NED_USER@$MACH:
 echo "after login scp"
 if [ "$?" != "0" ]; then
@@ -67,13 +68,14 @@ if [ "$?" != "0" ]; then
      exit -1
 fi
 
+echo "$SSH_PATH $NED_USER@$MACH chmod 755 .*.gmi* $WORK_DIR/.loadGMI*"
 $SSH_PATH $NED_USER@$MACH chmod 755 .*.gmi* $WORK_DIR/.loadGMI* 
-if [ "$?" != "0" ]; then
-     echo "There was a problem setting the permissions on the env files on $MACH"
-     echo "----------------------------"
-     echo ""
-     exit -1
-fi
+#if [ "$?" != "0" ]; then
+    #     echo "There was a problem setting the permissions on the env files on $MACH"
+    # echo "----------------------------"
+    # echo ""
+    # exit -1
+#fi
 
 echo "" 
 echo "Files installed successfully"
