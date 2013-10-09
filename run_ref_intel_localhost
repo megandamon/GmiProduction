@@ -20,7 +20,7 @@ setenv BASEDIR /discover/nobackup/projects/gmao/share/dao_ops/Baselibs/v3.2.0_bu
 
 cp namelist.list gmiResourceFile.rc
 limit stacksize unlimited
-$GEMHOME/./gmi.x | tee stdout.log
+MOCK $GEMHOME/./gmi.x | tee stdout.log
 
 # assumptions were made about the format of the name of this file.
 # this was done in order to define the year, month, and experiment name of this run 

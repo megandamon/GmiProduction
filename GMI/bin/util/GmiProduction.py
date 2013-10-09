@@ -160,6 +160,9 @@ class GmiProduction:
                    " -d " + self.nameListName
             fileLines [lineCounter] = fileLines [lineCounter] + \
                 "| tee stdout.log"
+         elif re.search ("MOCK", line):
+            fileLines [lineCounter] = " $GEMHOME/./gmi.x " + \
+                " -d " + self.nameListName  +  "| tee stdout.log"          
          elif re.search ("#PBS -W group_list", line):
             fileLines [lineCounter] = "#PBS -W group_list=" + chargeCode
          elif re.search ("#PBS -W depend", line):
