@@ -129,14 +129,23 @@ TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 NAME = Monitor Monthly Jobs
 DESCRIPTION = Monitors monthly run segments 
 TASK_TYPE = LOOP
-ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
+#ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
+ITERATION_LIMIT = 1
+
+[Task.Run Yearly Jobs.Monitor Monthly Jobs.Determine Model Timestep]
+NAME = Discovery Current Date
+DESCRIPTION = Use the stdout file to determine model's current time step 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/determine_model_timestep.bash
+TASK_DEPENDENCY = Reset Date eq Completed 
+
 
 [Task.Run Yearly Jobs.Monitor Monthly Jobs.Watch Job]
 NAME = Watch Monthly Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
-#EXECUTABLE_OBJECT = echo "Watch job place holder"
-EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
+#EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
+EXECUTABLE_OBJECT = echo "Placeholder"
 TASK_DEPENDENCY = Reset Date eq Completed 
 
 [Task.Run Yearly Jobs.Reset Job ID
