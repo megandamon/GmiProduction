@@ -8,6 +8,12 @@ LOGGING_DIRECTORY = log
 OVERALL_STATUS = QUEUED
 
 
+
+
+
+
+
+
 ###############################################################################
 #
 # Prepare the environment for running GMI
@@ -77,7 +83,11 @@ TASK_DEPENDENCY = Set Up Input Files eq Completed
 NAME = Run Yearly Jobs
 DESCRIPTION = Outer loop to handle multi-year production runs
 TASK_TYPE = LOOP
+TASK_STATUS = QUEUED
+RETRIES_ON_FAIL = 0
 ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+ITERATION = 0
+
 
 [Task.Run Yearly Jobs.Print Things]
 NAME = Print Things
@@ -122,31 +132,53 @@ TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting date for monitoring" >> $NED_WORKING_DIR/.exp_env.bash;echo "export CURRENT_DATE=" >> $NED_WORKING_DIR/.exp_env.bash
 TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 
+
+
+
+
 #------------------------------------------------------------------------------
 # Monitor Jobs
 #------------------------------------------------------------------------------
+
+
+
 [Task.Run Yearly Jobs.Monitor Monthly Jobs]
 NAME = Monitor Monthly Jobs
 DESCRIPTION = Monitors monthly run segments 
 TASK_TYPE = LOOP
-#ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS
-ITERATION_LIMIT = 1
-
-[Task.Run Yearly Jobs.Monitor Monthly Jobs.Determine Model Timestep]
-NAME = Discovery Current Date
-DESCRIPTION = Use the stdout file to determine model's current time step 
-TASK_TYPE = SYSTEM
-EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/determine_model_timestep.bash
-TASK_DEPENDENCY = Reset Date eq Completed 
+TASK_STATUS = UNKNOWN
+RETRIES_ON_FAIL = 0
+ITERATION_LIMIT = -1
+ITERATION = 0
+COMPLETION_DEPENDENCY  = Watch Job eq Completed
 
 
 [Task.Run Yearly Jobs.Monitor Monthly Jobs.Watch Job]
 NAME = Watch Monthly Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
-#EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/monitor_gmi_segment.bash
-EXECUTABLE_OBJECT = echo "Placeholder"
+TASK_STATUS = QUEUED
+RETRIES_ON_FAIL = 0
+ITERATION_LIMIT = 
+ITERATION = 0
+EXECUTABLE_OBJECT = ls "STOP"
+TASK_DEPENDENCY = Reset Date eq Completed CONTROL_TASK
+
+[Task.Run Yearly Jobs.Monitor Monthly Jobs.Determine Model Timestep]
+NAME = Discovery Current Date
+DESCRIPTION = Use the stdout file to determine model's current time step 
+TASK_TYPE = SYSTEM
+TASK_STATUS = QUEUED
+RETRIES_ON_FAIL = 0
+ITERATION_LIMIT = 
+ITERATION = 0
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/determine_model_timestep.bash
 TASK_DEPENDENCY = Reset Date eq Completed 
+
+
+
+
+
 
 [Task.Run Yearly Jobs.Reset Job ID
 NAME = Reset Job ID 

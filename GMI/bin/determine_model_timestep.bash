@@ -13,7 +13,14 @@ echo "------------------------"
 echo "About to call python..."
 
 python -u $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/DetermineModelTimeStep.py -f $WORK_DIR/stdout.log -e $NED_WORKING_DIR/.exp_env.bash
-echo $?
+returnCode=$?
 
-echo "Back in bash"
+echo "Back in bash, return code is: ", $returnCode
+
+if [ $returnCode == 1 ]; then
+	echo "Creating stop file"
+	touch STOP
+fi
+
+
 echo "Exiting determine_model_timestep.bash"

@@ -24,6 +24,18 @@ __author__ = 'Megan Damon'
 __version__ = '0.0'
 __date__ = '2013/3/10'
 
+def removeAllLinesMatching(matchString, lines):
+    
+    newLines = []
+    for line in lines:
+        if line.find(matchString) == -1:
+            newLines.append(line)
+    
+    return newLines
+             
+            
+    
+
 def executeSystemCmdAndCollectOutput(systemCommand):
     print systemCommand
     subProcess = subprocess.Popen(systemCommand, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -82,11 +94,6 @@ if len (optList) != NUM_ARGS:
 stdoutFileName = optList[0][1]
 expEnvFile = optList[1][1]
 
-monthsOfTheYear = {'01':'jan', '02':'feb', '03':'mar', \
-                       '04': 'apr', '05': 'may', '06': 'jun', \
-                       '07': 'jul', '08': 'aug', '09': 'sep', \
-                       '10': 'oct', '11': 'nov', '12': 'dec'}
-
 try:
     expEnvLines = ioRoutines.readFile(expEnvFile)
 except:
@@ -122,15 +129,8 @@ cmdOut = executeSystemCmdAndCollectOutput(systemCommand)
 ymdLines = cmdOut.split(searchString)
 
 lastYmd = extractYmdFromLine(ymdLines, 1, NUM_SPLIT_ARGS)
-# TODO: The check for case #1 below isn't valid. Normally, all processors report this.
-# Therefore, the 2nd to last line is likely not going to be the line we need.
-# Possible process:
-    # toss all lines in ymdLines that have lastYmd in it
-    # from the new list, use the last line as "secondToLastYmd"
-secondToLastYmd = extractYmdFromLine(ymdLines, 2, NUM_SPLIT_ARGS)   
-
-print "last ymd: ", lastYmd
-
+newYmdLines = removeAllLinesMatching (lastYmd, ymdLines)
+secondToLastYmd = extractYmdFromLine(newYmdLines, 1, NUM_SPLIT_ARGS)
 
 # if the current job has completed, a few things could be true:
 # 1. The simulation is complete and the calling task shouldn't be called again. 
@@ -140,6 +140,7 @@ print "last ymd: ", lastYmd
 if (completeSuccessfulJob == True):
     
     endDate = extractEnvVariable(expEnvLines, "export END_DATE=")
+    
     if endDate == None:
         print "Check END_DATE"
         sys.exit(-1)
@@ -147,17 +148,23 @@ if (completeSuccessfulJob == True):
     # case 1. 
     if (endDate == secondToLastYmd):
         print "Simulation completed"
+        print "UPDATE: reached end date: ", lastYmd
         # if the simulation is done, signal to the calling process that it is
-        sys.exit(2)
+        sys.exit(1)
+    
     
     # cases 2. and 3.
     else:
+        print "UPDATE: current YMD: ", lastYmd
         print "Simulation not complete"
         sys.exit(0)
 
 #sleep and repeat the process
 else:
+    # TODO - or possibly use "retries on fail" option in NED
     print "The current job appears to be time stepping... will sleep and re-confirm"
+    print "UPDATE: current YMD: ", lastYmd
+    time.sleep(5)
     # first save the old last ymd line
     # now sleep
     # get new last ymd line
