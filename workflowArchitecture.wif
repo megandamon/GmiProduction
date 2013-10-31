@@ -147,6 +147,197 @@ EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting job ID at
 TASK_DEPENDENCY = Watch Job eq Completed
 
 
+#------------------------------------------------------------------------------
+# Copy output to archive directory
+#------------------------------------------------------------------------------
+[Task.Organize GMI Output]
+NAME = Organize GMI Output
+DESCRIPTION = Outer loop to process multi-year output data
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+#TASK_STATUS = SUSPENDED
+TASK_DEPENDENCY = Reset Job ID eq Completed
+
+[Task.Organize GMI Output.Create Archive Directory Structure]
+NAME = Create Archive Directory Structure
+DESCRIPTION = Creates the Archive directory structure
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CreateDirectoryStructure.bash 
+TASK_DEPENDENCY = Reset Job ID eq Completed
+
+[Task.Organize GMI Output.Move Station Files]
+NAME = Move Station Files
+DESCRIPTION = Moves station files to ./completed/YYYY/stations
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveStationFiles.bash 
+TASK_DEPENDENCY = Create Archive Directory Structure eq Completed
+
+[Task.Organize GMI Output.Move Diagnostics Files]
+NAME = Move Diagnostics Files
+DESCRIPTION = Moves diagnostic files to completed/YYYY/diagnostics
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveDiagnosticFiles.bash 
+TASK_DEPENDENCY = Move Station Files eq Completed
+
+[Task.Organize GMI Output.Move Netcdf Files]
+NAME = Move Netcdf Files
+DESCRIPTION = Moves remaining Netcdf files to completed/YYYY/
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveNetcdfFiles.bash 
+TASK_DEPENDENCY = Move Diagnostics Files eq Completed
+
+[Task.Organize GMI Output.Move Metdata Files]
+NAME = Move Metdata Files
+DESCRIPTION = Moves metdata files to completed/metdata_files/
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveMetdataFiles.bash 
+TASK_DEPENDENCY = Move Netcdf Files eq Completed
+
+[Task.Organize GMI Output.Move Run Files]
+NAME = Move Run Files
+DESCRIPTION = Moves run files to completed/YYYY/run_info
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveRunFiles.bash 
+TASK_DEPENDENCY = Move Metdata Files eq Completed
+
+[Task.Organize GMI Output.Archive Files]
+NAME = Archive Files
+DESCRIPTION = Archive files to GMI area
+TASK_TYPE = PARENT
+TASK_DEPENDENCY = Move Run Files eq Completed
+
+[Task.Organize GMI Output.Archive Files.Archive Metdata Files]
+NAME = Archive Metdata Files
+DESCRIPTION = Moves metdata files to GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveMetdataFiles.bash 
+TASK_DEPENDENCY = Move Run Files eq Completed
+
+[Task.Organize GMI Output.Archive Files.Archive Year Directory]
+NAME = Archive Year Directory
+DESCRIPTION = Moves year directory to GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveYearDirectory.bash 
+TASK_DEPENDENCY = Archive Metdata Files eq Completed
+
+[Task.Organize GMI Output.Archive Files.Check Files]
+NAME = Check Files
+DESCRIPTION = Checks files in the GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CheckFiles.bash 
+TASK_DEPENDENCY = Archive Year Directory eq Completed
+
+#------------------------------------------------------------------------------
+# Process Stations into Monthly Files
+#------------------------------------------------------------------------------
+
+[Task.Create Remote Working Dir]
+NAME = Create Remote Working Dir
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CreateRemoteWorkingDir.bash 
+TASK_DEPENDENCY = Check Files eq Completed
+#TASK_STATUS = SUSPENDED
+
+[Task.Do Station Processing]
+NAME = Do Station Processing
+DESCRIPTION = Outer loop to handle multi-year station data
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+TASK_DEPENDENCY = Create Remote Working Dir eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations]
+NAME = Process Monthly Stations
+DESCRIPTION = Processes monthly stations
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Station Processing.Workflow Properties.Date and Time.NUM_SUBMITS
+TASK_DEPENDENCY = Create Remote Working Dir eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Pull Stations Off Tape]
+NAME = Pull Stations Off Tape
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/PullStationsOffTape.bash 
+TASK_DEPENDENCY = Create Remote Working Dir eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Copy Stations to Directory]
+NAME = Copy Stations to Directory
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CopyStationsToDir.bash 
+TASK_DEPENDENCY = Pull Stations Off Tape eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Cross Check Station Names]
+NAME = Cross Check Station Names
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CrossCheckStationNames.bash
+TASK_DEPENDENCY = Copy Stations to Directory eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Create Station Name File]
+NAME = Create Station Name File
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CreateStationNameFile.bash
+TASK_DEPENDENCY = Cross Check Station Names eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Do NCO Utils Processing]
+NAME = Do NCO Utils Processing 
+DESCRIPTION = Do NCO operations on station files
+TASK_TYPE = PARENT
+TASK_DEPENDENCY = Create Station Name File eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Do NCO Utils Processing.NCKS Header Data]
+NAME = NCKS Header Data
+DESCRIPTION = Get header data from a single station
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/NcksHeaderData.bash
+TASK_DEPENDENCY = Create Station Name File eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Do NCO Utils Processing.NCECAT Station Files]
+NAME = NCECAT Station Files
+DESCRIPTION = Concatenate station files into one file
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/NcecatStationFiles.bash
+TASK_DEPENDENCY = NCKS Header Data eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Do NCO Utils Processing.NCKS Other Fields]
+NAME = NCKS Other Fields
+DESCRIPTION = Get other fields into concatenated station file
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/NcksOtherFields.bash
+TASK_DEPENDENCY = NCECAT Station Files eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Do NCO Utils Processing.Remove Separate Files]
+NAME = Remove Separate Files]
+DESCRIPTION = Remove station data from working directory
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/RemoveSeparateFiles.bash
+TASK_DEPENDENCY = NCKS Other Fields eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Archive Separate Files]
+NAME = Archive Separate Files
+DESCRIPTION = Move the station files to a subdirectory under "stations"
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveSeperateFiles.bash
+TASK_DEPENDENCY = Remove Separate Files eq Completed
+
+[Task.Do Station Processing.Process Monthly Stations.Archive Processed File]
+NAME = Archive Processed File
+DESCRIPTION = Move the processed station file to the archive
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveProcessedFile.bash
+TASK_DEPENDENCY = Archive Separate Files eq Completed
+
+
+[Task.Remove Files From Working Directory]
+NAME = Remove Files From Working Directory
+DESCRIPTION = MANUAL TASK - Run this to remove all files from working directory
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/RemoveFiles.bash 
+TASK_DEPENDENCY = MANUAL_TASK
+TASK_STATUS = SUSPENDED
+
 
 #------------------------------------------------------------------------------
 # User Utilities

@@ -1,4 +1,4 @@
-#PBS -S /usr/local/bin/csh
+#!/bin/csh
 #PBS -N gmiWork 
 #PBS -q datamove 
 #PBS -l walltime=1:00:00
