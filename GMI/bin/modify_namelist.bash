@@ -11,8 +11,6 @@ echo "NED_WORKING_DIR: $NED_WORKING_DIR"
 echo "------------------------"
 echo ""
 
-echo "------------------------"
-echo "CURRENT_DATE = $CURRENT_DATE"
 
 if [ "$COMPILE" = "yes" ]; then
 
@@ -30,13 +28,30 @@ echo "Calling python script to modify current namelist"
 $CHMOD_PATH 775 $NED_WORKING_DIR/base.in
 
 if [ "$CURRENT_DATE" == "" ]; then
-   export CURRENT_DATE=$START_DATE 
+	export CURRENT_DATE=$START_DATE 
+	export CURRENT_START_DATE=$START_DATE
+	let numSubmissions=1
 else 
    CURRENT_DATE=`$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/./IncrementMonth.py -d $CURRENT_DATE` 
+	let numSubmissions=numSubmissions+1
+fi
+
+if [ $numSubmissions -gt $NUM_SUBMITS ]; then
+	let numSubmissions=1
+	export CURRENT_START_DATE=$CURRENT_DATE
+fi
+
+if [ $numSubmissions == $NUM_SUBMITS ]; then
+	export CURRENT_END_DATE=`$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/./IncrementMonth.py -d $CURRENT_DATE` 
+	#export CURRENT_END_DATE=$CURRENT_DATE
+	echo "export CURRENT_END_DATE=$CURRENT_END_DATE" >> $NED_WORKING_DIR/.exp_env.bash
 fi
 
 echo "export CURRENT_DATE=$CURRENT_DATE" >> $NED_WORKING_DIR/.exp_env.bash
-echo "Current date: ", $CURRENT_DATE
+echo "export CURRENT_START_DATE=$CURRENT_START_DATE" >> $NED_WORKING_DIR/.exp_env.bash
+echo "export numSubmissions=$numSubmissions" >> $NED_WORKING_DIR/.exp_env.bash 
+echo "CURRENT_DATE : ", $CURRENT_DATE
+echo "numSubmissions : ", $numSubmissions
 
 export replaceRestart=1
 if [ "$CURRENT_DATE" == "$START_DATE" ]; then

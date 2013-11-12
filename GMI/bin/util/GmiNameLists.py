@@ -144,7 +144,7 @@ class GmiNameLists:
               option = options[1]
               value = splitString[1]
               
-              print "Found MATCH LINE: ", option, value
+              
               
               if option == "MATCH_BC_TO_YEAR":
                   matchBcToYear = bool(1)
@@ -180,7 +180,6 @@ class GmiNameLists:
               option = options[1]
               value = splitString[1]
               
-              print "Found INITIAL LINE: ", option, value
               
               if option == "INITIAL_YEAR_FORC_BC":
                   initialYearForcBc = value
@@ -194,7 +193,6 @@ class GmiNameLists:
                 
                 
 
-      print" done reading loop"
 
       # read the starting namelist file
       infil='%s/%s' % (pathToNameList, namelistfile)
@@ -249,7 +247,7 @@ class GmiNameLists:
       restartYear=currentYear
 
 
-      print splitProblemName
+      
 
       
       # will be used to make the namelists file
@@ -342,11 +340,10 @@ class GmiNameLists:
             splitKeyWord = re.split(splitter, keyWord) 
             
             keyWord = splitKeyWord[0] 
-            print "keyWord: ", keyWord
             
             if len(splitLine) == 2:
                 value = splitLine[1]
-                print "value: ", value
+                
 
 
             if keyWord == 'problem_name':
@@ -486,7 +483,7 @@ class GmiNameLists:
       ioObject.writeToFile (listOfNamelists,pathToNameList+"/namelists.list")
 
 
-      print "Days in this month (", monthId, ") ", daysPerMonth[monthId-1]
+      
       if int(currentYear)% 4 == 0 and monthId == 2:
          print "leap year!"
          daysInMonth = 29

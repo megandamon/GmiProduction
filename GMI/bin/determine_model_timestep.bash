@@ -18,8 +18,17 @@ returnCode=$?
 echo "Back in bash, return code is: ", $returnCode
 
 if [ $returnCode == 1 ]; then
-	echo "Creating stop file"
+	echo "Year over. Creating STOP file..."
 	touch STOP
+fi
+
+if [ $returnCode == 0 ]; then
+	echo "Year not over."
+fi
+
+if [ $returnCode == 254 ]; then
+	echo "Model has likely crashed/aborted in error/killed in queue"
+	exit -1
 fi
 
 

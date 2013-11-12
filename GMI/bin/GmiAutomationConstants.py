@@ -70,8 +70,8 @@ class GmiAutomationConstants:
    NCKSPATH = "/local/LinuxIA64/nco/3.1.1/bin/"
    MAILPATH = "/usr/bin/"
    DATEPATH = "/bin/"
-   QSUBPATH = "/usr/pbs/bin/"
-   QSTATPATH = "/usr/pbs/bin/"
+   QSUBPATH = "/usr/slurm/bin/"
+   QSTATPATH = "/usr/slurm/bin/"
    INCRDATEPATH = ""
    
    MAXPBSJOBNAMELENGTH = 15

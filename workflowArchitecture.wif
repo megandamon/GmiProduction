@@ -8,12 +8,6 @@ LOGGING_DIRECTORY = log
 OVERALL_STATUS = QUEUED
 
 
-
-
-
-
-
-
 ###############################################################################
 #
 # Prepare the environment for running GMI
@@ -89,13 +83,6 @@ ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
 ITERATION = 0
 
 
-[Task.Run Yearly Jobs.Print Things]
-NAME = Print Things
-DESCRIPTION = Prints things
-TASK_TYPE = SYSTEM
-EXECUTABLE_OBJECT = echo GMI Test Workflow.Workflow Properties.Date and Time.NUM_SUBMITS; echo GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
-TASK_DEPENDENCY = Regrid Files eq Completed
-
 
 [Task.Run Yearly Jobs.Submit Monthly Jobs]
 NAME = Submit Monthly Jobs
@@ -125,11 +112,11 @@ TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/create_pbs_script.bash 
 TASK_DEPENDENCY = Modify Metfields eq Completed
 
-[Task.Run Yearly Jobs.Reset Date]
-NAME = Reset Date 
+[Task.Run Yearly Jobs.Set Dates]
+NAME = Set Dates 
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
-EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting date for monitoring" >> $NED_WORKING_DIR/.exp_env.bash;echo "export CURRENT_DATE=" >> $NED_WORKING_DIR/.exp_env.bash
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/set_dates.bash 
 TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 
 
@@ -139,9 +126,6 @@ TASK_DEPENDENCY = Submit Monthly Jobs eq Completed
 #------------------------------------------------------------------------------
 # Monitor Jobs
 #------------------------------------------------------------------------------
-
-
-
 [Task.Run Yearly Jobs.Monitor Monthly Jobs]
 NAME = Monitor Monthly Jobs
 DESCRIPTION = Monitors monthly run segments 
@@ -162,7 +146,7 @@ RETRIES_ON_FAIL = 0
 ITERATION_LIMIT = 
 ITERATION = 0
 EXECUTABLE_OBJECT = ls "STOP"
-TASK_DEPENDENCY = Reset Date eq Completed CONTROL_TASK
+TASK_DEPENDENCY = Create PBS Script eq Completed CONTROL_TASK
 
 [Task.Run Yearly Jobs.Monitor Monthly Jobs.Determine Model Timestep]
 NAME = Discovery Current Date
@@ -173,11 +157,7 @@ RETRIES_ON_FAIL = 0
 ITERATION_LIMIT = 
 ITERATION = 0
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/determine_model_timestep.bash
-TASK_DEPENDENCY = Reset Date eq Completed 
-
-
-
-
+TASK_DEPENDENCY = Create PBS Script eq Completed 
 
 
 [Task.Run Yearly Jobs.Reset Job ID
@@ -186,6 +166,97 @@ DESCRIPTION =
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = . $NED_WORKING_DIR/.exp_env.bash; echo "#Resetting job ID at end of the year" >> $NED_WORKING_DIR/.exp_env.bash;echo "export jobID=0000" >> $NED_WORKING_DIR/.exp_env.bash
 TASK_DEPENDENCY = Watch Job eq Completed
+
+
+#------------------------------------------------------------------------------
+# Copy output to archive directory
+#------------------------------------------------------------------------------
+[Task.Run Yearly Jobs.Organize GMI Output]
+NAME = Organize GMI Output
+DESCRIPTION = Outer loop to process multi-year output data
+TASK_TYPE = LOOP
+TASK_STATUS = QUEUED
+RETRIES_ON_FAIL = 0
+ITERATION_LIMIT = GMI Test Workflow.Workflow Properties.Date and Time.NUM_YEARS
+TASK_DEPENDENCY = Reset Job ID eq Completed
+ITERATION = 0
+
+[Task.Run Yearly Jobs.Organize GMI Output.Create Archive Directory Structure]
+NAME = Create Archive Directory Structure
+DESCRIPTION = Creates the Archive directory structure
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CreateDirectoryStructure.bash 
+TASK_DEPENDENCY = Reset Job ID eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Move Station Files]
+NAME = Move Station Files
+DESCRIPTION = Moves station files to ./completed/YYYY/stations
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveStationFiles.bash 
+TASK_DEPENDENCY = Create Archive Directory Structure eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Move Diagnostics Files]
+NAME = Move Diagnostics Files
+DESCRIPTION = Moves diagnostic files to completed/YYYY/diagnostics
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveDiagnosticFiles.bash 
+TASK_DEPENDENCY = Move Station Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Move Netcdf Files]
+NAME = Move Netcdf Files
+DESCRIPTION = Moves remaining Netcdf files to completed/YYYY/
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveNetcdfFiles.bash 
+TASK_DEPENDENCY = Move Diagnostics Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Move Metdata Files]
+NAME = Move Metdata Files
+DESCRIPTION = Moves metdata files to completed/metdata_files/
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveMetdataFiles.bash 
+TASK_DEPENDENCY = Move Netcdf Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Move Run Files]
+NAME = Move Run Files
+DESCRIPTION = Moves run files to completed/YYYY/run_info
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/MoveRunFiles.bash 
+TASK_DEPENDENCY = Move Metdata Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Archive Files]
+NAME = Archive Files
+DESCRIPTION = Archive files to GMI area
+TASK_TYPE = PARENT
+TASK_DEPENDENCY = Move Run Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Archive Files.Archive Metdata Files]
+NAME = Archive Metdata Files
+DESCRIPTION = Moves metdata files to GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveMetdataFiles.bash 
+TASK_DEPENDENCY = Move Run Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Archive Files.Archive Year Directory]
+NAME = Archive Year Directory
+DESCRIPTION = Moves year directory to GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ArchiveYearDirectory.bash 
+TASK_DEPENDENCY = Archive Metdata Files eq Completed
+
+[Task.Run Yearly Jobs.Organize GMI Output.Archive Files.Check Files]
+NAME = Check Files
+DESCRIPTION = Checks files in the GMI archive area
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/CheckFiles.bash 
+TASK_DEPENDENCY = Archive Year Directory eq Completed
+
+
+
+
+
+
+
+
 
 
 
@@ -203,7 +274,6 @@ NAME = Clean Environment
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = sleep 2
-TASK_DEPENDENCY
 TASK_STATUS = SUSPENDED
 
 [Task.User Utilities.Kill Job]
@@ -211,7 +281,6 @@ NAME = Kill Job
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = sleep 2
-TASK_DEPENDENCY
 TASK_STATUS = SUSPENDED
 
 [Task.User Utilities.Transfer Outputs to GMI Archive]
@@ -219,5 +288,4 @@ NAME = Transfer Outputs to GMI Archive
 DESCRIPTION = 
 TASK_TYPE = SYSTEM
 EXECUTABLE_OBJECT = $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/transfer_output.bash
-TASK_DEPENDENCY
-TASK_DEPENDENCY = SUSPENDED
+TASK_STATUS = SUSPENDED

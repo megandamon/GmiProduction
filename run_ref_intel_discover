@@ -1,4 +1,4 @@
-#PBS -S /usr/local/bin/csh
+#!/bin/csh
 #PBS -N aura4
 #PBS -q general
 #PBS -l select=34:ncpus=4
