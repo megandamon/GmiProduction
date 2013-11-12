@@ -84,7 +84,7 @@ class GmiProduction:
                            chargeCode, chemicalMechanism, destinationDirectory, wallTime, \
                            useNlInMpi, lastJobId):
 
-      print "numProcessorsPerhNOde: ", numProcessorsPerNode
+      print "numProcessorsPerNode: ", numProcessorsPerNode
       print "useNlInMpi: ", useNlInMpi
 
       if len (self.nameListName) <= 0:
@@ -113,7 +113,7 @@ class GmiProduction:
 
       # create the new queue file
       if len (self.base) > self.constants.MAXPBSJOBNAMELENGTH:
-         self.queueJobName = self.base[0:self.constants.MAXPBSJOBNAMELENGTH]
+         self.queueJobName = self.base[5:self.constants.MAXPBSJOBNAMELENGTH+5]
       else:
          self.queueJobName = self.base
       

@@ -16,7 +16,6 @@ export metArchive=$ARCHIVE_DIR/metdata_files
 echo "----------------------------"
 echo "Archive metdata files"
 echo "------------------------"
-echo ""	
 
 echo "ssh $NED_USER@$MACH ls $metArchive"
 ssh $NED_USER@$MACH ls $metArchive

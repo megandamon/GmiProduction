@@ -2,7 +2,7 @@
 #PBS -N aura4
 #PBS -q general
 #PBS -l select=34:ncpus=4
-#PBS -l walltime=7:00:00
+#PBS -l walltime=3:00:00
 #PBS -W group_list=k3002
 #PBS -W depend=afterok:0000
 #PBS -j eo 
