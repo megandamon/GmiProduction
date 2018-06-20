@@ -84,7 +84,7 @@ class GmiProduction:
                            chargeCode, chemicalMechanism, destinationDirectory, wallTime, \
                            useNlInMpi, lastJobId):
 
-      print "numProcessorsPerhNOde: ", numProcessorsPerNode
+      print "numProcessorsPerNode: ", numProcessorsPerNode
       print "useNlInMpi: ", useNlInMpi
 
       if len (self.nameListName) <= 0:
@@ -113,7 +113,7 @@ class GmiProduction:
 
       # create the new queue file
       if len (self.base) > self.constants.MAXPBSJOBNAMELENGTH:
-         self.queueJobName = self.base[0:self.constants.MAXPBSJOBNAMELENGTH]
+         self.queueJobName = self.base[5:self.constants.MAXPBSJOBNAMELENGTH+5]
       else:
          self.queueJobName = self.base
       
@@ -146,13 +146,14 @@ class GmiProduction:
       # change the new file
       lineCounter = 0
       for line in fileLines:
-         if line[0:7] == "#PBS -N":
+         if re.search ("#SBATCH -A", line):
+            fileLines [lineCounter] = "#SBATCH -A " + chargeCode
+         elif line[0:7] == "#PBS -N":
             fileLines [lineCounter] = "#PBS -N " + self.queueJobName
          elif line[0:7] == "#PBS -q":
             fileLines [lineCounter] = "#PBS -q " + self.queueName
          elif re.search ("mpirun", line):
             fileLines [lineCounter] = line + " " + \
-                " -perhost " + str(numProcessorsPerNode) + \
                 " -np " + str(numProcessors) + \
                 " $GEMHOME/gmi.x " 
             if useNlInMpi == "T":
@@ -163,13 +164,14 @@ class GmiProduction:
          elif re.search ("MOCK", line):
             fileLines [lineCounter] = " $GEMHOME/./gmi.x " + \
                 " -d " + self.nameListName  +  "| tee stdout.log"          
-         elif re.search ("#PBS -W group_list", line):
-            fileLines [lineCounter] = "#PBS -W group_list=" + chargeCode
-         elif re.search ("#PBS -W depend", line):
+#         elif re.search ("#PBS -W group_list", line):
+#            fileLines [lineCounter] = "#PBS -W group_list=" + chargeCode
+#        elif re.search ("#PBS -W depend", line):
+         elif re.search ("#SBATCH --depend", line):
             print "found depend line"
             if lastJobId != None:
                print "job id is not none"
-               fileLines [lineCounter] = "#PBS -W depend=afterok:" + lastJobId         
+               fileLines [lineCounter] = "#SBATCH --dependency=afterany:" + lastJobId         
             else:
                print "IN ELSE"
                fileLines [lineCounter] = ""

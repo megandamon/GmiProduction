@@ -1,8 +1,9 @@
-#PBS -S /usr/local/bin/csh
+#!/bin/csh
+#SBATCH  -A a930b
 #PBS -N gmiWork 
 #PBS -q datamove 
 #PBS -l walltime=1:00:00
-#PBS -W group_list=k3002
+#PBS -W group_list=a930b
 #PBS -j eo 
 
 setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
