@@ -27,10 +27,13 @@ module load mpi/impi-17.0.0.098
 module load lib/mkl-17.0.0.098
 module load other/SSSO_Ana-PyD/SApd_4.1.1_py2.7_gcc-5.3-sp3 other/cmake
 
-setenv BASEDIR /discover/swdev/mathomp4/Baselibs/TmpBaselibs/GMAO-Baselibs-5_0_2-ESMF-7_1_0_beta_snapshot_17/x86_64-unknown-linux-gnu/ifort_17.0.0.098-intelmpi_17.0.0.098
+setenv BASEDIR /discover/swdev/mathomp4/Baselibs/GMAO-Baselibs-5_0_2/x86_64-unknown-linux-gnu/ifort_17.0.0.098-intelmpi_17.0.0.098
 
 setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:$BASEDIR/Linux/lib
 
 cp namelist.list gmiResourceFile.rc
 limit stacksize unlimited
+
+echo " GMI CTM segment is starting " | mail -s "GMI production segment starting" megandamon@gmail.com
+
 time mpirun 
