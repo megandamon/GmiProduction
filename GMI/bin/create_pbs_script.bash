@@ -102,3 +102,6 @@ fi
 
 echo "jobID: ", $jobID
 echo "export $currentMonth$currentYear"JobID"=$jobID" >> $NED_WORKING_DIR/.exp_env.bash
+
+echo "YEAR: ", $currentYear
+echo "export YEAR=$currentYear" >> $NED_WORKING_DIR/.exp_env.bash

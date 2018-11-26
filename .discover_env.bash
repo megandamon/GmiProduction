@@ -9,4 +9,3 @@ export MKDIR=/bin/mkdir
 export LS=/bin/ls
 export CVS=/usr/bin/cvs
 export QDEL=/usr/slurm/bin/qdel
-
