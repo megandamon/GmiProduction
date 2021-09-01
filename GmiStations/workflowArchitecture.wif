@@ -1,0 +1,118 @@
+[Workflow Architecture]
+NAME = GmiStations
+VERSION = 1.0.0
+CREATOR =
+CREATION_DATE = 
+DESCRIPTION =
+LOGGING_DIRECTORY = log
+OVERALL_STATUS = QUEUED
+
+
+###############################################################################
+#
+# Prepare the station data for GMI station processing
+#
+###############################################################################
+
+
+[Task.Create Remote Working Dir]
+NAME = Create Remote Working Dir
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/CreateRemoteWorkingDir.bash 
+TASK_DEPENDENCY = 
+
+
+[Task.Process Monthly Stations]
+NAME = Process Monthly Stations
+DESCRIPTION = Processes monthly stations
+TASK_TYPE = LOOP
+ITERATION_LIMIT = GMI Station Processing.Workflow Properties.Date and Time.NUM_SUBMITS
+TASK_DEPENDENCY = Create Remote Working Dir eq Completed
+
+
+[Task.Process Monthly Stations.Pull Stations Off Tape]
+NAME = Pull Stations Off Tape
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/PullStationsOffTape.bash 
+TASK_DEPENDENCY = Create Remote Working Dir eq Completed
+
+
+[Task.Process Monthly Stations.Copy Stations to Directory]
+NAME = Copy Stations to Directory
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/CopyStationsToDir.bash 
+TASK_DEPENDENCY = Pull Stations Off Tape eq Completed
+
+
+[Task.Process Monthly Stations.Cross Check Station Names]
+NAME = Cross Check Station Names
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/CrossCheckStationNames.bash
+TASK_DEPENDENCY = Copy Stations to Directory eq Completed
+
+
+[Task.Process Monthly Stations.Create Station Name File]
+NAME = Create Station Name File
+DESCRIPTION = 
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/CreateStationNameFile.bash
+TASK_DEPENDENCY = Cross Check Station Names eq Completed
+
+
+[Task.Process Monthly Stations.Do NCO Utils Processing]
+NAME = Do NCO Utils Processing 
+DESCRIPTION = Do NCO operations on station files
+TASK_TYPE = PARENT
+TASK_DEPENDENCY = Create Station Name File eq Completed
+
+
+[Task.Process Monthly Stations.Do NCO Utils Processing.NCKS Header Data]
+NAME = NCKS Header Data
+DESCRIPTION = Get header data from a single station
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/NcksHeaderData.bash
+TASK_DEPENDENCY = Create Station Name File eq Completed
+
+
+[Task.Process Monthly Stations.Do NCO Utils Processing.NCECAT Station Files]
+NAME = NCECAT Station Files
+DESCRIPTION = Concatenate station files into one file
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/NcecatStationFiles.bash
+TASK_DEPENDENCY = NCKS Header Data eq Completed
+
+
+[Task.Process Monthly Stations.Do NCO Utils Processing.NCKS Other Fields]
+NAME = NCKS Other Fields
+DESCRIPTION = Get other fields into concatenated station file
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/NcksOtherFields.bash
+TASK_DEPENDENCY = NCECAT Station Files eq Completed
+
+
+[Task.Process Monthly Stations.Do NCO Utils Processing.Remove Separate Files]
+NAME = Remove Separate Files]
+DESCRIPTION = Remove station data from working directory
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/RemoveSeparateFiles.bash
+TASK_DEPENDENCY = NCKS Other Fields eq Completed
+
+
+[Task.Process Monthly Stations.Archive Separate Files]
+NAME = Archive Separate Files
+DESCRIPTION = Move the station files to a subdirectory under "stations"
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/ArchiveSeperateFiles.bash
+TASK_DEPENDENCY = Remove Separate Files eq Completed
+
+
+[Task.Process Monthly Stations.Archive Processed File]
+NAME = Archive Processed File
+DESCRIPTION = Move the processed station file to the archive
+TASK_TYPE = SYSTEM
+EXECUTABLE_OBJECT = $NED_WORKING_DIR/bin/ArchiveProcessedFile.bash
+TASK_DEPENDENCY = Archive Separate Files eq Completed
