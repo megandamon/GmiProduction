@@ -1,0 +1,17 @@
+#!/bin/csh
+#SBATCH  -A a930b
+#PBS -N gmiWork 
+#PBS -q datamove 
+#PBS -l walltime=1:00:00
+#PBS -W group_list=a930b
+#PBS -j eo 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+
+cd $workDir
+cd completed
+
+bbscp year/diagnostics 
+bbscp year/run_info 
+bbscp year/stations
+bbscp year/ 

@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Compile GMI code"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <compile_gmi.h>
+
+%include <tail.h>

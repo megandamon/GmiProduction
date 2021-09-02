@@ -1,0 +1,43 @@
+#!/usr/bin/python
+
+#------------------------------------------------------------------------------
+# AUTHORS:      Megan Damon
+# AFFILIATION:  NASA GSFC / NGIT / TASC
+# DATE:         October 28th, 2010
+#
+# DESCRIPTION:
+# This script will increment the date given by one month
+# 
+# Execute this script by typing : 
+# python  IncrementMonth.py -d YYYYMMDD
+#                                   
+# NOTE:
+#
+# Modification History
+#------------------------------------------------------------------------------
+
+__author__ = 'Megan Damon'
+__version__ = '0.0'
+__date__ = '2008/24/4'
+
+
+import getopt
+import sys
+import os
+import time
+import commands
+
+NUM_ARGS=1
+
+def usage ():
+    print "Usage: IncrementMonth.py [-d]"
+    sys.exit (0)
+
+#---------------------------------------------------------------
+# Get options from command line
+#---------------------------------------------------------------
+optList, argList = getopt.getopt(sys.argv[1:],'d:')
+
+if len (optList) != NUM_ARGS:
+    usage ()
+

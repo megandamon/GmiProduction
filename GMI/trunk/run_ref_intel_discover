@@ -1,0 +1,39 @@
+#!/bin/csh
+#SBATCH -A a930b
+#SBATCH --qos=high
+#PBS -N aura4 
+#SBATCH --partition=compute
+#SBATCH --ntasks=576
+#SBATCH --time=06:00:00 
+#SBATCH --dependency=afterany:0000
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 
+
+setenv CHEMCASE strat_trop
+
+cd $workDir
+
+setenv MPI_USE_XPMEM
+setenv MPI_BUFFER_MAX 2000
+setenv MPI_TYPE_MAX   655360
+setenv MPI_MSGS_MAX   10485760
+setenv MPI_GROUP_MAX 128
+
+module purge
+module load other/comp/gcc-5.3-sp3
+module load comp/intel-17.0.0.098
+module load mpi/impi-17.0.0.098
+module load lib/mkl-17.0.0.098
+module load other/SSSO_Ana-PyD/SApd_4.1.1_py2.7_gcc-5.3-sp3 other/cmake
+
+setenv BASEDIR /discover/swdev/mathomp4/Baselibs/GMAO-Baselibs-5_0_2/x86_64-unknown-linux-gnu/ifort_17.0.0.098-intelmpi_17.0.0.098
+
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:$BASEDIR/Linux/lib
+
+cp namelist.list gmiResourceFile.rc
+limit stacksize unlimited
+
+echo " GMI CTM segment is starting " | mail -s "GMI production segment starting" megandamon@gmail.com
+
+time mpirun 

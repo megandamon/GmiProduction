@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Prepare env files for GMI on HPC"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <setup_gmi_env.h>
+
+%include <tail.h>

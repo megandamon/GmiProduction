@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Install GMI executable or compile"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <prepare_installation.h>
+
+%include <tail.h>

@@ -1,0 +1,12 @@
+%include <head.h>
+
+msg="Last transfer %DATE%"
+smslabel Running "$msg"
+
+THE_DATE=%DATE%
+export CURRENT_DATE=$THE_DATE
+
+%include <.ned_env.h>
+%include <transfer_output.h>
+
+%include <tail.h>

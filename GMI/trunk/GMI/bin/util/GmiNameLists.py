@@ -419,7 +419,7 @@ class GmiNameLists:
                 if lightYearStartNum < 0: 
                     print "lightYearStartNum cannot be less than 0!"
                     sys.exit (-1)
-
+                
                 print "lightYearStartNum: ", lightYearStartNum
                 ofil.write('lightYearDim' + splitter + str(lightYearStartNum) + endLine)
                 #ofil.write('lightYearDim' + splitter + str(int(startymd[0:4]) - 1989) + endLine)
@@ -436,18 +436,19 @@ class GmiNameLists:
                 splitEmiss = re.split("_", value) 
                 newEmiss = splitEmiss[0] + "_" + startymd[0:4] + "_" + splitEmiss[2]+ "_" + splitEmiss[3] + "_" + splitEmiss[4]
                 print "newEmiss: ", newEmiss
-                ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)   
+                ofil.write('emiss_infile_name' + splitter + newEmiss + endLine)
 
-            #/discover/nobackup/projects/gmi/gmidata2/input/chemistry/aerodust/aerodust_MERRA2_1x1.25x72_20190101.nc
+            # /discover/nobackup/projects/gmi/gmidata2/input/chemistry/aerodust/aerodust_MERRA2_1x1.25x72_20190101.nc
             elif keyWord == 'AerDust_infile_name' and \
-                    matchAerToYear == True:
-                print "Modified"
-                splitAer = re.split("_", value) 
-                newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + startymd[0:4] + "0101.nc"
-                print "newAer: ", newAer
-                ofil.write('AerDust_infile_name' + splitter + newAer + endLine)   
+                        matchAerToYear == True:
 
-            
+                print "Modified"
+                splitAer = re.split("_", value)
+                newAer = splitAer[0] + "_" + splitAer[1] + "_" + splitAer[2] + "_" + startymd[0:6] + "01.nc"
+                print "newAer: ", newAer
+                ofil.write('AerDust_infile_name' + splitter + newAer + endLine)
+
+
             elif keyWord == 'begGmiDate':
                ofil.write('begGmiDate' + splitter + currentYear + strmonthId \
                              + '01'  + endLine)

@@ -1,0 +1,21 @@
+#PBS -S /usr/local/bin/csh
+#PBS -N aura4
+#PBS -q general
+#PBS -l select=34:ncpus=4:scali=true
+#PBS -l walltime=7:00:00
+#PBS -W group_list=k3002
+#PBS -j eo 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 
+
+setenv CHEMCASE strat_trop
+
+cd $workDir
+
+module purge
+module load comp/intel-9.1.042
+module load mpi/scali-5
+
+limit stacksize unlimited
+time mpirun -inherit_limits -np 

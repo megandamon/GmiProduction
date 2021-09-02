@@ -1,0 +1,174 @@
+#!/bin/bash
+
+
+. $NED_WORKING_DIR/.exp_env.bash
+. $ENV_FILE
+
+echo "------------------------"
+echo "NED_USER: $NED_USER"
+echo "NED_WORKING_DIR: $NED_WORKING_DIR"
+echo "------------------------"
+echo ""
+
+echo "------------------------"
+
+echo ""
+
+export ARCHIVE_ENV_FILE="$NED_WORKING_DIR/.$ARCHIVE_MACH"_env.bash
+echo "ARCHIVE_ENV_FILE: $ARCHIVE_ENV_FILE"
+
+. $ARCHIVE_ENV_FILE
+
+echo "Creating the output directory: $ARCHIVE_DIR on $ARCHIVE_MACH"
+echo "$SSH_PATH $NED_USER@$ARCHIVE_MACH $MKDIR -p $ARCHIVE_DIR "
+$SSH_PATH $NED_USER@$ARCHIVE_MACH $MKDIR -p $ARCHIVE_DIR 
+if [ "$?" != "0" ]; then
+   echo "Could not create the directory $ARCHIVE_DIR on $ARCHIVE_MACH" 
+   echo "----------------------------"
+   echo ""
+   exit -1
+fi
+
+echo "----------------------------"
+
+
+export NAMELIST_FILE="gmiWork.in"
+
+echo "$PYTHON_PATH $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/MakeQueueScript.py -f $NED_WORKING_DIR/transfer_ref -n \"4\" -e $NUM_PROCS_PER_NODE -m $NAMELIST_FILE -p $WORK_DIR -c $GROUP_LIST -a $CHEMISTRY -d $NED_WORKING_DIR -w \"1:00:00\" -w -s $scali -u false -i $INCLUDE_NL_MPIRUN"
+$PYTHON_PATH $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/MakeQueueScript.py -f $NED_WORKING_DIR/transfer_ref -n "4" -e $NUM_PROCS_PER_NODE -m $NAMELIST_FILE -p $WORK_DIR -c $GROUP_LIST -a $CHEMISTRY -d $NED_WORKING_DIR -w "1:00:00" -e $scali -u false -i $INCLUDE_NL_MPIRUN
+
+
+. $ENV_FILE
+
+export TRANSFER_FILE=$NED_WORKING_DIR/gmiWork.qsub
+echo "$SCP_PATH $TRANSFER_FILE $NED_USER@$MACH:$WORK_DIR"
+$SCP_PATH $TRANSFER_FILE $NED_USER@$MACH:$WORK_DIR
+if [ "$?" != "0" ]; then
+    echo "There was a problem updating the the transfer file: $TRANSFER_FILE"
+    echo "------------------------"
+    exit -1
+fi
+
+
+
+# get the accounting file name
+. $NED_WORKING_DIR/.accounting_path
+echo "accountingFile = $accountingFile"
+echo "NED_REAL_USER = $NED_REAL_USER"
+
+if [ "$NED_REAL_USER" == "" ]; then
+   export NED_REAL_USER=$NED_USER
+fi
+
+# call the script to submit the job, record the accounting information and append jobID to the env file
+echo "$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/SubmitPbsJobAndRecord.py -f $WORK_DIR/gmiWork.qsub -q $QSUB -a $accountingFile -n $NED_USER -r $NED_REAL_USER -w $NED_WORKING_DIR/.exp_env.bash  -s $MACH"
+$NED_WORKING_DIR/$NED_UNIQUE_ID/bin/util/SubmitPbsJobAndRecord.py -f $WORK_DIR/gmiWork.qsub -q $QSUB -a $accountingFile -n $NED_USER -r $NED_REAL_USER -w $NED_WORKING_DIR/.exp_env.bash  -s $MACH
+
+echo $?
+
+. $NED_WORKING_DIR/.exp_env.bash
+
+
+
+if [ "$jobID" == "" ]; then
+    echo "There was a queue submission problem"
+    exit -1
+fi
+
+
+#------------------------------------------------------------------------------
+# watch the job until it runs or exits
+#------------------------------------------------------------------------------
+
+
+status = ""
+let numberOfEmpty=0
+export jobId=$jobID
+
+echo "--------------------------------------------------------------------"
+while true; do
+
+   echo -e "\nssh $NED_USER@$MACH $QSTAT | grep ${jobId} | awk '{print $5}'"
+   status=`ssh $NED_USER@$MACH $QSTAT | grep ${jobId} | awk '{print $5}'`
+   echo "status is $status"
+   
+   sleep 45
+
+   #--------------------------------------------------------------------------
+   # look at the state of the job
+   #---------------------------------------------------------------------------
+   if [ "$status"  = "Q" ]; then
+       
+      echo "Job is queued, status is $status"
+
+   elif [ "$status" = "R" ]; then
+
+      echo "Job is now running, status is $status"
+   
+   elif [ "$status" = "" ]; then
+
+    counter=0
+    numberOfEmpty=0
+
+    #---------------------------------------------------------------------------
+    # keeps checking the batch system in case of a false negative 
+    #--------------------------------------------------------------------------
+    while [ $counter -lt 5 ]; do
+       sleep 10
+       status=`ssh $NED_USER@$MACH $QSTAT | grep ${jobId} | awk '{print $5}'`
+       if [ "$status"  = "" ]; then
+          echo "Job status is empty again!"
+          let numberOfEmpty=numberOfEmpty+1
+       fi
+       let counter=counter+1
+    done
+
+    #---------------------------------------------------------------------------
+    # exit when satified that the job has finished
+
+
+    #--------------------------------------------------------------------------
+    if [ $numberOfEmpty -gt 4 ]; then
+	echo "job status is empty! - will exit"
+	break
+    fi
+  
+  fi
+
+done
+
+
+#---------------------------------------------------------------------------
+# move the standard output/error file
+#--------------------------------------------------------------------------
+if [ $numberOfEmpty -gt 4 ] && [ "$status" = "" ]; then
+
+
+    echo -e "\nssh $NED_USER@$MACH ls *$jobId"
+    ssh $NED_USER@$MACH ls *$jobId
+    if [ "$?" != "0" ]; then
+       echo -e "\nssh $NED_USER@$MACH ls *$jobId"
+       ssh $NED_USER@$MACH ls *$jobId
+       if [ "$?" != "0" ]; then
+	   echo "Could not retrieve the standard err/out file for $jobId"
+	   exit -1
+       fi
+
+    else
+
+       echo -e "\nssh $NED_USER@$MACH mv -f *$jobId $WORK_DIR"
+       ssh $NED_USER@$MACH mv -f *$jobId $WORK_DIR
+       if [ "$?" != "0" ]; then
+	   echo "Could not move the standard err/out file for $jobId"
+	   exit -1
+       fi
+
+    fi
+
+fi
+
+
+echo "export VIS_DIR=$ARCHIVE_DIR" >> $NED_WORKING_DIR/.exp_env.bash
+echo "export VIS_SYS=$ARCHIVE_MACH" >> $NED_WORKING_DIR/.exp_env.bash
+
+exit 0

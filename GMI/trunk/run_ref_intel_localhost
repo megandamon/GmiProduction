@@ -1,0 +1,372 @@
+#PBS -S /usr/local/bin/csh
+#PBS -N aura4
+#PBS -q general
+#PBS -l select=34:ncpus=4
+#PBS -l walltime=7:00:00
+#PBS -W group_list=k3002
+#PBS -W depend=afterok:0000
+#PBS -j eo 
+
+set fileNamePath = $0 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin
+
+setenv CHEMCASE strat_trop
+
+cd $workDir
+
+setenv BASEDIR /discover/nobackup/projects/gmao/share/dao_ops/Baselibs/v3.2.0_buildSLES11
+
+cp namelist.list gmiResourceFile.rc
+limit stacksize unlimited
+MOCK $GEMHOME/./gmi.x | tee stdout.log
+
+# assumptions were made about the format of the name of this file.
+# this was done in order to define the year, month, and experiment name of this run 
+# numbers associated with -f should be extracted up a level 
+# Megan.R.Damon@nasa.gov
+set fileName = `echo $fileNamePath| cut -d'/' -f 8`
+set expName = `echo $fileName| cut -d'_' -f 2`
+set year = `echo $fileName| cut -d'_' -f 3`
+set monthExt = `echo $fileName| cut -d'_' -f 4`
+set month = `echo $monthExt| cut -d'.' -f 1`
+
+echo "FILE NAME: " $fileName >> stdout.log
+echo "EXP NAME: " $expName >> stdout.log
+echo "YEAR: " $year >> stdout.log
+echo "MONTH: " $month >> stdout.log
+
+cp stdout.log gmi${year}${month}0000.erun
+
+touch gmic_${expName}_${year}_${month}_column.nc
+touch gmic_${expName}_${year}_${month}_idaily.nc
+touch gmic_${expName}_${year}_${month}_amonthly.nc
+touch gmic_${expName}_${year}_${month}_aerdust.nc
+touch gmic_${expName}_${year}_${month}_rst.nc
+touch gmic_${expName}_${year}_${month}_overpass1.nc
+touch gmic_${expName}_${year}_${month}_overpass2.nc
+touch gmic_${expName}_${year}_${month}_tend.nc
+touch gmic_${expName}_${year}_${month}_sad.nc
+touch gmic_${expName}_${year}_${month}_flux.nc
+touch gmic_${expName}_${year}_${month}_qqjk.nc
+touch gmic_${expName}_${year}_${month}_qj.nc
+touch gmic_${expName}_${year}_${month}_qk.nc
+touch gmic_${expName}_${year}_${month}_AAZ.profile.nc
+touch gmic_${expName}_${year}_${month}_ABI.profile.nc
+touch gmic_${expName}_${year}_${month}_ALA.profile.nc
+touch gmic_${expName}_${year}_${month}_ALE.profile.nc
+touch gmic_${expName}_${year}_${month}_ALH.profile.nc
+touch gmic_${expName}_${year}_${month}_ALT.profile.nc
+touch gmic_${expName}_${year}_${month}_ANN.profile.nc
+touch gmic_${expName}_${year}_${month}_AMS.profile.nc
+touch gmic_${expName}_${year}_${month}_ARK.profile.nc
+touch gmic_${expName}_${year}_${month}_ASC.profile.nc
+touch gmic_${expName}_${year}_${month}_ASH.profile.nc
+touch gmic_${expName}_${year}_${month}_ASK.profile.nc
+touch gmic_${expName}_${year}_${month}_ASP.profile.nc
+touch gmic_${expName}_${year}_${month}_ATL.profile.nc
+touch gmic_${expName}_${year}_${month}_AVI.profile.nc
+touch gmic_${expName}_${year}_${month}_AZR.profile.nc
+touch gmic_${expName}_${year}_${month}_BAL.profile.nc
+touch gmic_${expName}_${year}_${month}_BAN.profile.nc
+touch gmic_${expName}_${year}_${month}_BEI.profile.nc
+touch gmic_${expName}_${year}_${month}_BHD.profile.nc
+touch gmic_${expName}_${year}_${month}_BIS.profile.nc
+touch gmic_${expName}_${year}_${month}_BIT.profile.nc
+touch gmic_${expName}_${year}_${month}_BLD.profile.nc
+touch gmic_${expName}_${year}_${month}_BLU.profile.nc
+touch gmic_${expName}_${year}_${month}_BME.profile.nc
+touch gmic_${expName}_${year}_${month}_BMW.profile.nc
+touch gmic_${expName}_${year}_${month}_BOB.profile.nc
+touch gmic_${expName}_${year}_${month}_BOG.profile.nc
+touch gmic_${expName}_${year}_${month}_BON.profile.nc
+touch gmic_${expName}_${year}_${month}_BRA.profile.nc
+touch gmic_${expName}_${year}_${month}_BRW.profile.nc
+touch gmic_${expName}_${year}_${month}_BSC.profile.nc
+touch gmic_${expName}_${year}_${month}_CAD.profile.nc
+touch gmic_${expName}_${year}_${month}_CAG.profile.nc
+touch gmic_${expName}_${year}_${month}_CAI.profile.nc
+touch gmic_${expName}_${year}_${month}_CAN.profile.nc
+touch gmic_${expName}_${year}_${month}_CAR.profile.nc
+touch gmic_${expName}_${year}_${month}_CBA.profile.nc
+touch gmic_${expName}_${year}_${month}_CG2.profile.nc
+touch gmic_${expName}_${year}_${month}_CGO.profile.nc
+touch gmic_${expName}_${year}_${month}_CHA.profile.nc
+touch gmic_${expName}_${year}_${month}_CHI.profile.nc
+touch gmic_${expName}_${year}_${month}_CHJ.profile.nc
+touch gmic_${expName}_${year}_${month}_CHR.profile.nc
+touch gmic_${expName}_${year}_${month}_CHT.profile.nc
+touch gmic_${expName}_${year}_${month}_CHU.profile.nc
+touch gmic_${expName}_${year}_${month}_CIN.profile.nc
+touch gmic_${expName}_${year}_${month}_CKI.profile.nc
+touch gmic_${expName}_${year}_${month}_CLA.profile.nc
+touch gmic_${expName}_${year}_${month}_CMO.profile.nc
+touch gmic_${expName}_${year}_${month}_CMT.profile.nc
+touch gmic_${expName}_${year}_${month}_CMW.profile.nc
+touch gmic_${expName}_${year}_${month}_CNC.profile.nc
+touch gmic_${expName}_${year}_${month}_CNT.profile.nc
+touch gmic_${expName}_${year}_${month}_COF.profile.nc
+touch gmic_${expName}_${year}_${month}_COM.profile.nc
+touch gmic_${expName}_${year}_${month}_CON.profile.nc
+touch gmic_${expName}_${year}_${month}_COT.profile.nc
+touch gmic_${expName}_${year}_${month}_CPT.profile.nc
+touch gmic_${expName}_${year}_${month}_CRZ.profile.nc
+touch gmic_${expName}_${year}_${month}_CUI.profile.nc
+touch gmic_${expName}_${year}_${month}_CWI.profile.nc
+touch gmic_${expName}_${year}_${month}_DAK.profile.nc
+touch gmic_${expName}_${year}_${month}_DAL.profile.nc
+touch gmic_${expName}_${year}_${month}_DEL.profile.nc
+touch gmic_${expName}_${year}_${month}_DFO.profile.nc
+touch gmic_${expName}_${year}_${month}_DOU.profile.nc
+touch gmic_${expName}_${year}_${month}_DUB.profile.nc
+touch gmic_${expName}_${year}_${month}_EDM.profile.nc
+touch gmic_${expName}_${year}_${month}_EDG.profile.nc
+touch gmic_${expName}_${year}_${month}_EGB.profile.nc
+touch gmic_${expName}_${year}_${month}_EIC.profile.nc
+touch gmic_${expName}_${year}_${month}_ENE.profile.nc
+touch gmic_${expName}_${year}_${month}_EUR.profile.nc
+touch gmic_${expName}_${year}_${month}_FAN.profile.nc
+touch gmic_${expName}_${year}_${month}_FIJ.profile.nc
+touch gmic_${expName}_${year}_${month}_FOR.profile.nc
+touch gmic_${expName}_${year}_${month}_FRA.profile.nc
+touch gmic_${expName}_${year}_${month}_FWI.profile.nc
+touch gmic_${expName}_${year}_${month}_GBO.profile.nc
+touch gmic_${expName}_${year}_${month}_GCT.profile.nc
+touch gmic_${expName}_${year}_${month}_GLR.profile.nc
+touch gmic_${expName}_${year}_${month}_GMI.profile.nc
+touch gmic_${expName}_${year}_${month}_GMV.profile.nc
+touch gmic_${expName}_${year}_${month}_GOZ.profile.nc
+touch gmic_${expName}_${year}_${month}_GRB.profile.nc
+touch gmic_${expName}_${year}_${month}_GRC.profile.nc
+touch gmic_${expName}_${year}_${month}_GTH.profile.nc
+touch gmic_${expName}_${year}_${month}_GTK.profile.nc
+touch gmic_${expName}_${year}_${month}_HAN.profile.nc
+touch gmic_${expName}_${year}_${month}_HAP.profile.nc
+touch gmic_${expName}_${year}_${month}_HAR.profile.nc
+touch gmic_${expName}_${year}_${month}_HBA.profile.nc
+touch gmic_${expName}_${year}_${month}_HLO.profile.nc
+touch gmic_${expName}_${year}_${month}_HOH.profile.nc
+touch gmic_${expName}_${year}_${month}_HON.profile.nc
+touch gmic_${expName}_${year}_${month}_HON2.profile.nc
+touch gmic_${expName}_${year}_${month}_HOU.profile.nc
+touch gmic_${expName}_${year}_${month}_HUN.profile.nc
+touch gmic_${expName}_${year}_${month}_HUNT.profile.nc
+touch gmic_${expName}_${year}_${month}_HYD.profile.nc
+touch gmic_${expName}_${year}_${month}_IN1.profile.nc
+touch gmic_${expName}_${year}_${month}_IN2.profile.nc
+touch gmic_${expName}_${year}_${month}_I30.profile.nc
+touch gmic_${expName}_${year}_${month}_I40.profile.nc
+touch gmic_${expName}_${year}_${month}_I50.profile.nc
+touch gmic_${expName}_${year}_${month}_ICE.profile.nc
+touch gmic_${expName}_${year}_${month}_INV.profile.nc
+touch gmic_${expName}_${year}_${month}_IRD.profile.nc
+touch gmic_${expName}_${year}_${month}_IRE.profile.nc
+touch gmic_${expName}_${year}_${month}_ISF.profile.nc
+touch gmic_${expName}_${year}_${month}_ITN.profile.nc
+touch gmic_${expName}_${year}_${month}_IZO.profile.nc
+touch gmic_${expName}_${year}_${month}_JOH.profile.nc
+touch gmic_${expName}_${year}_${month}_JOS.profile.nc
+touch gmic_${expName}_${year}_${month}_JPI.profile.nc
+touch gmic_${expName}_${year}_${month}_JUN.profile.nc
+touch gmic_${expName}_${year}_${month}_KAG.profile.nc
+touch gmic_${expName}_${year}_${month}_KCO.profile.nc
+touch gmic_${expName}_${year}_${month}_KEL.profile.nc
+touch gmic_${expName}_${year}_${month}_KEN.profile.nc
+touch gmic_${expName}_${year}_${month}_KER.profile.nc
+touch gmic_${expName}_${year}_${month}_KEY.profile.nc
+touch gmic_${expName}_${year}_${month}_KGI.profile.nc
+touch gmic_${expName}_${year}_${month}_KLA.profile.nc
+touch gmic_${expName}_${year}_${month}_KPA.profile.nc
+touch gmic_${expName}_${year}_${month}_KUAL.profile.nc
+touch gmic_${expName}_${year}_${month}_KUM.profile.nc
+touch gmic_${expName}_${year}_${month}_KUN.profile.nc
+touch gmic_${expName}_${year}_${month}_KZD.profile.nc
+touch gmic_${expName}_${year}_${month}_KZM.profile.nc
+touch gmic_${expName}_${year}_${month}_LAG.profile.nc
+touch gmic_${expName}_${year}_${month}_LAREUNI.profile.nc
+touch gmic_${expName}_${year}_${month}_LAU.profile.nc
+touch gmic_${expName}_${year}_${month}_LAV.profile.nc
+touch gmic_${expName}_${year}_${month}_LEF.profile.nc
+touch gmic_${expName}_${year}_${month}_LGN.profile.nc
+touch gmic_${expName}_${year}_${month}_LHA.profile.nc
+touch gmic_${expName}_${year}_${month}_LHS.profile.nc
+touch gmic_${expName}_${year}_${month}_LIN.profile.nc
+touch gmic_${expName}_${year}_${month}_LON.profile.nc
+touch gmic_${expName}_${year}_${month}_LUA.profile.nc
+touch gmic_${expName}_${year}_${month}_LWV.profile.nc
+touch gmic_${expName}_${year}_${month}_LZC.profile.nc
+touch gmic_${expName}_${year}_${month}_AD.profile.nc
+touch gmic_${expName}_${year}_${month}_AL.profile.nc
+touch gmic_${expName}_${year}_${month}_AQ.profile.nc
+touch gmic_${expName}_${year}_${month}_AR.profile.nc
+touch gmic_${expName}_${year}_${month}_AW.profile.nc
+touch gmic_${expName}_${year}_${month}_BC.profile.nc
+touch gmic_${expName}_${year}_${month}_BO.profile.nc
+touch gmic_${expName}_${year}_${month}_CM.profile.nc
+touch gmic_${expName}_${year}_${month}_EV.profile.nc
+touch gmic_${expName}_${year}_${month}_HD.profile.nc
+touch gmic_${expName}_${year}_${month}_ID.profile.nc
+touch gmic_${expName}_${year}_${month}_IN.profile.nc
+touch gmic_${expName}_${year}_${month}_KG.profile.nc
+touch gmic_${expName}_${year}_${month}_LO.profile.nc
+touch gmic_${expName}_${year}_${month}_MO.profile.nc
+touch gmic_${expName}_${year}_${month}_ND.profile.nc
+touch gmic_${expName}_${year}_${month}_ON.profile.nc
+touch gmic_${expName}_${year}_${month}_OS.profile.nc
+touch gmic_${expName}_${year}_${month}_NAH.profile.nc
+touch gmic_${expName}_${year}_${month}_NAI.profile.nc
+touch gmic_${expName}_${year}_${month}_NAM.profile.nc
+touch gmic_${expName}_${year}_${month}_NAT.profile.nc
+touch gmic_${expName}_${year}_${month}_NEU.profile.nc
+touch gmic_${expName}_${year}_${month}_NEW.profile.nc
+touch gmic_${expName}_${year}_${month}_NDI.profile.nc
+touch gmic_${expName}_${year}_${month}_NMB.profile.nc
+touch gmic_${expName}_${year}_${month}_NOR.profile.nc
+touch gmic_${expName}_${year}_${month}_NRU.profile.nc
+touch gmic_${expName}_${year}_${month}_NWR.profile.nc
+touch gmic_${expName}_${year}_${month}_NZL.profile.nc
+touch gmic_${expName}_${year}_${month}_OAH.profile.nc
+touch gmic_${expName}_${year}_${month}_OGA.profile.nc
+touch gmic_${expName}_${year}_${month}_OIJ.profile.nc
+touch gmic_${expName}_${year}_${month}_OKI.profile.nc
+touch gmic_${expName}_${year}_${month}_OOR.profile.nc
+touch gmic_${expName}_${year}_${month}_OPW.profile.nc
+touch gmic_${expName}_${year}_${month}_OSA.profile.nc
+touch gmic_${expName}_${year}_${month}_PAGO.profile.nc
+touch gmic_${expName}_${year}_${month}_PAL.profile.nc
+touch gmic_${expName}_${year}_${month}_PAN.profile.nc
+touch gmic_${expName}_${year}_${month}_PAPEE.profile.nc
+touch gmic_${expName}_${year}_${month}_PAR.profile.nc
+touch gmic_${expName}_${year}_${month}_PARIS.profile.nc
+touch gmic_${expName}_${year}_${month}_PAY.profile.nc
+touch gmic_${expName}_${year}_${month}_PAT.profile.nc
+touch gmic_${expName}_${year}_${month}_PEE.profile.nc
+touch gmic_${expName}_${year}_${month}_PEI.profile.nc
+touch gmic_${expName}_${year}_${month}_PEK.profile.nc
+touch gmic_${expName}_${year}_${month}_PEN.profile.nc
+touch gmic_${expName}_${year}_${month}_PHX.profile.nc
+touch gmic_${expName}_${year}_${month}_PIN.profile.nc
+touch gmic_${expName}_${year}_${month}_PIT.profile.nc
+touch gmic_${expName}_${year}_${month}_PNA.profile.nc
+touch gmic_${expName}_${year}_${month}_PNE.profile.nc
+touch gmic_${expName}_${year}_${month}_PNN.profile.nc
+touch gmic_${expName}_${year}_${month}_PNW.profile.nc
+touch gmic_${expName}_${year}_${month}_POO.profile.nc
+touch gmic_${expName}_${year}_${month}_PORT.profile.nc
+touch gmic_${expName}_${year}_${month}_PND.profile.nc
+touch gmic_${expName}_${year}_${month}_PRA.profile.nc
+touch gmic_${expName}_${year}_${month}_PRT.profile.nc
+touch gmic_${expName}_${year}_${month}_PSA.profile.nc
+touch gmic_${expName}_${year}_${month}_PSE.profile.nc
+touch gmic_${expName}_${year}_${month}_PSS.profile.nc
+touch gmic_${expName}_${year}_${month}_PSW.profile.nc
+touch gmic_${expName}_${year}_${month}_PT1.profile.nc
+touch gmic_${expName}_${year}_${month}_PT2.profile.nc
+touch gmic_${expName}_${year}_${month}_PT3.profile.nc
+touch gmic_${expName}_${year}_${month}_PT4.profile.nc
+touch gmic_${expName}_${year}_${month}_PT5.profile.nc
+touch gmic_${expName}_${year}_${month}_PT6.profile.nc
+touch gmic_${expName}_${year}_${month}_PTA.profile.nc
+touch gmic_${expName}_${year}_${month}_PW1.profile.nc
+touch gmic_${expName}_${year}_${month}_PW2.profile.nc
+touch gmic_${expName}_${year}_${month}_PW3.profile.nc
+touch gmic_${expName}_${year}_${month}_PW4.profile.nc
+touch gmic_${expName}_${year}_${month}_PW5.profile.nc
+touch gmic_${expName}_${year}_${month}_PW6.profile.nc
+touch gmic_${expName}_${year}_${month}_PWW.profile.nc
+touch gmic_${expName}_${year}_${month}_REG.profile.nc
+touch gmic_${expName}_${year}_${month}_RES.profile.nc
+touch gmic_${expName}_${year}_${month}_REU.profile.nc
+touch gmic_${expName}_${year}_${month}_REY.profile.nc
+touch gmic_${expName}_${year}_${month}_RIK.profile.nc
+touch gmic_${expName}_${year}_${month}_RIO.profile.nc
+touch gmic_${expName}_${year}_${month}_RIS.profile.nc
+touch gmic_${expName}_${year}_${month}_RPB.profile.nc
+touch gmic_${expName}_${year}_${month}_RPI.profile.nc
+touch gmic_${expName}_${year}_${month}_RYO.profile.nc
+touch gmic_${expName}_${year}_${month}_SAD.profile.nc
+touch gmic_${expName}_${year}_${month}_SAN.profile.nc
+touch gmic_${expName}_${year}_${month}_SANCRIS.profile.nc
+touch gmic_${expName}_${year}_${month}_SANT.profile.nc
+touch gmic_${expName}_${year}_${month}_SAO.profile.nc
+touch gmic_${expName}_${year}_${month}_SAP.profile.nc
+touch gmic_${expName}_${year}_${month}_SBA.profile.nc
+touch gmic_${expName}_${year}_${month}_SCO.profile.nc
+touch gmic_${expName}_${year}_${month}_SCR.profile.nc
+touch gmic_${expName}_${year}_${month}_SEQ.profile.nc
+touch gmic_${expName}_${year}_${month}_SEY.profile.nc
+touch gmic_${expName}_${year}_${month}_SGA.profile.nc
+touch gmic_${expName}_${year}_${month}_SGI.profile.nc
+touch gmic_${expName}_${year}_${month}_SHA.profile.nc
+touch gmic_${expName}_${year}_${month}_SHM.profile.nc
+touch gmic_${expName}_${year}_${month}_SHU.profile.nc
+touch gmic_${expName}_${year}_${month}_SIO.profile.nc
+touch gmic_${expName}_${year}_${month}_SLC.profile.nc
+touch gmic_${expName}_${year}_${month}_SMO.profile.nc
+touch gmic_${expName}_${year}_${month}_SMT.profile.nc
+touch gmic_${expName}_${year}_${month}_SNC.profile.nc
+touch gmic_${expName}_${year}_${month}_SOC.profile.nc
+touch gmic_${expName}_${year}_${month}_SOD.profile.nc
+touch gmic_${expName}_${year}_${month}_SOF.profile.nc
+touch gmic_${expName}_${year}_${month}_SON.profile.nc
+touch gmic_${expName}_${year}_${month}_SPO.profile.nc
+touch gmic_${expName}_${year}_${month}_STC.profile.nc
+touch gmic_${expName}_${year}_${month}_STM.profile.nc
+touch gmic_${expName}_${year}_${month}_STR.profile.nc
+touch gmic_${expName}_${year}_${month}_SUM.profile.nc
+touch gmic_${expName}_${year}_${month}_SUVA.profile.nc
+touch gmic_${expName}_${year}_${month}_SX1.profile.nc
+touch gmic_${expName}_${year}_${month}_SX2.profile.nc
+touch gmic_${expName}_${year}_${month}_SX3.profile.nc
+touch gmic_${expName}_${year}_${month}_SX4.profile.nc
+touch gmic_${expName}_${year}_${month}_SX5.profile.nc
+touch gmic_${expName}_${year}_${month}_SYG.profile.nc
+touch gmic_${expName}_${year}_${month}_SYO.profile.nc
+touch gmic_${expName}_${year}_${month}_TA1.profile.nc
+touch gmic_${expName}_${year}_${month}_TA2.profile.nc
+touch gmic_${expName}_${year}_${month}_TA3.profile.nc
+touch gmic_${expName}_${year}_${month}_TA4.profile.nc
+touch gmic_${expName}_${year}_${month}_TA5.profile.nc
+touch gmic_${expName}_${year}_${month}_TA6.profile.nc
+touch gmic_${expName}_${year}_${month}_TAE.profile.nc
+touch gmic_${expName}_${year}_${month}_TAH.profile.nc
+touch gmic_${expName}_${year}_${month}_TAI.profile.nc
+touch gmic_${expName}_${year}_${month}_TAP.profile.nc
+touch gmic_${expName}_${year}_${month}_TAPPI.profile.nc
+touch gmic_${expName}_${year}_${month}_TAT.profile.nc
+touch gmic_${expName}_${year}_${month}_TDF.profile.nc
+touch gmic_${expName}_${year}_${month}_TEH.profile.nc
+touch gmic_${expName}_${year}_${month}_TEL.profile.nc
+touch gmic_${expName}_${year}_${month}_TEN.profile.nc
+touch gmic_${expName}_${year}_${month}_TOKY.profile.nc
+touch gmic_${expName}_${year}_${month}_TRH.profile.nc
+touch gmic_${expName}_${year}_${month}_TRI.profile.nc
+touch gmic_${expName}_${year}_${month}_TUV.profile.nc
+touch gmic_${expName}_${year}_${month}_TVD.profile.nc
+touch gmic_${expName}_${year}_${month}_UCC.profile.nc
+touch gmic_${expName}_${year}_${month}_UNI.profile.nc
+touch gmic_${expName}_${year}_${month}_USH.profile.nc
+touch gmic_${expName}_${year}_${month}_UTA.profile.nc
+touch gmic_${expName}_${year}_${month}_UUM.profile.nc
+touch gmic_${expName}_${year}_${month}_VEN.profile.nc
+touch gmic_${expName}_${year}_${month}_VIE.profile.nc
+touch gmic_${expName}_${year}_${month}_WAS.profile.nc
+touch gmic_${expName}_${year}_${month}_WAT.profile.nc
+touch gmic_${expName}_${year}_${month}_WIN.profile.nc
+touch gmic_${expName}_${year}_${month}_WIS.profile.nc
+touch gmic_${expName}_${year}_${month}_WKT.profile.nc
+touch gmic_${expName}_${year}_${month}_WLG.profile.nc
+touch gmic_${expName}_${year}_${month}_WLI.profile.nc
+touch gmic_${expName}_${year}_${month}_WNY.profile.nc
+touch gmic_${expName}_${year}_${month}_XIN.profile.nc
+touch gmic_${expName}_${year}_${month}_YAR.profile.nc
+touch gmic_${expName}_${year}_${month}_YEL.profile.nc
+touch gmic_${expName}_${year}_${month}_YNC.profile.nc
+touch gmic_${expName}_${year}_${month}_YON.profile.nc
+touch gmic_${expName}_${year}_${month}_YUS.profile.nc
+touch gmic_${expName}_${year}_${month}_ZEP.profile.nc
+touch gmic_${expName}_${year}_${month}_ZIN.profile.nc
+touch gmic_${expName}_${year}_${month}_ZUG.profile.nc
+touch gmic_${expName}_${year}_${month}_ZVE.profile.nc
+

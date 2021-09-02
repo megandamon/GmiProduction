@@ -1,0 +1,12 @@
+%include <head.h>
+
+msg="Modify namelist for current run segment"
+smslabel Info "$msg"
+
+THE_DATE=%DATE%
+export CURRENT_DATE=$THE_DATE
+
+%include <.ned_env.h>
+%include <modify_namelist.h>
+
+%include <tail.h>

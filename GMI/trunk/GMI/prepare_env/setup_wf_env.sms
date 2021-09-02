@@ -1,0 +1,9 @@
+%include <head.h>
+
+msg="Set up necessary workflow variables"
+smslabel Info "$msg"
+
+%include <.ned_env.h>
+%include <setup_wf_env.h>
+
+%include <tail.h>

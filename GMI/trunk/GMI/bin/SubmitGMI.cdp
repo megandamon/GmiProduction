@@ -1,0 +1,71 @@
+#!/bin/bash
+
+#Get the user and the working wirectory
+export NED_USER=$1
+export NED_WORKING_DIR=$2
+export NED_UNIQUE_ID=$3
+export NED_REAL_USER=$4
+
+echo "The GMI submission script have been called" >> $NED_WORKING_DIR/main.log
+echo $NED_USER >> $NED_WORKING_DIR/main.log
+echo $NED_WORKING_DIR >> $NED_WORKING_DIR/main.log
+echo $NED_UNIQUE_ID >> $NED_WORKING_DIR/main.log
+
+
+# check to see if the top level experiment directory exists
+echo "Checking if top level experiment directory exists..."  >> $NED_WORKING_DIR/main.log
+echo "ls $NED_WORKING_DIR/$NED_UNIQUE_ID"  >> $NED_WORKING_DIR/main.log
+
+ls $NED_WORKING_DIR/$NED_UNIQUE_ID
+if [ "$?" != "0" ]; then
+   # rename the top level experiment directory
+    echo "mv $NED_WORKING_DIR/GMI/ $NED_WORKING_DIR/$NED_UNIQUE_ID" >> $NED_WORKING_DIR/main.log
+    mv $NED_WORKING_DIR/GMI/ $NED_WORKING_DIR/$NED_UNIQUE_ID >> $NED_WORKING_DIR/main.log 
+
+else
+    echo "mv $NED_WORKING_DIR/GMI/* $NED_WORKING_DIR/$NED_UNIQUE_ID/" >> $NED_WORKING_DIR/main.log
+    mv $NED_WORKING_DIR/GMI/* $NED_WORKING_DIR/$NED_UNIQUE_ID/ >> $NED_WORKING_DIR/main.log
+fi
+
+
+# create a definition file using the unique id
+/usr/local/bin/perl $NED_WORKING_DIR/$NED_UNIQUE_ID/bin/ModifySMSDefFile.pl $NED_WORKING_DIR/GMI.def $NED_UNIQUE_ID >> $NED_WORKING_DIR/$NED_UNIQUE_ID.def
+
+# set the permissions
+chmod 775 $NED_WORKING_DIR/$NED_UNIQUE_ID.def >> $NED_WORKING_DIR/main.log
+
+# Create include file to hold NED env vars (needed by workflow)
+cat << _EOF_ > $NED_WORKING_DIR/$NED_UNIQUE_ID/include/.ned_env.h
+#!/bin/ksh
+NED_USER=%NED_USER%
+NED_WORKING_DIR=%NED_WORKING_DIR%
+NED_UNIQUE_ID=%NED_UNIQUE_ID%
+export NED_USER NED_WORKING_DIR NED_REAL_USER NED_UNIQUE_ID NED_DISPLAY
+_EOF_
+
+chmod 775 $NED_WORKING_DIR/.exp_env.bash >> $NED_WORKING_DIR/main.log
+
+#Source the variable file to get dates 
+. $NED_WORKING_DIR/.exp_env.bash >> $NED_WORKING_DIR/main.log
+
+echo $START_DATE >> $NED_WORKING_DIR/main.log
+echo $END_DATE >> $NED_WORKING_DIR/main.log
+echo $NED_WORKING_DIR  >> $NED_WORKING_DIR/main.log
+echo $NED_UNIQUE_ID  >> $NED_WORKING_DIR/main.log
+echo $NED_USER  >> $NED_WORKING_DIR/main.log
+
+export startDate=$START_DATE
+export endDate=$END_DATE
+
+#Call the SMS via CDP
+/home/workflow/prism_system/sms/bin/cdp << EOF
+   login localhost UID $NED_USER 
+   set startSegment $startDate
+   set endSegment $endDate
+   set NED_WORKING_DIR $NED_WORKING_DIR
+   set NED_UNIQUE_ID $NED_UNIQUE_ID
+   set NED_USER $NED_USER
+   set NED_REAL_USER $NED_REAL_USER
+   play $NED_WORKING_DIR/$NED_UNIQUE_ID.def
+   begin $NED_UNIQUE_ID 
+EOF 

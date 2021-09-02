@@ -1,0 +1,37 @@
+#!/bin/csh
+#SBATCH -A a930b
+#PBS -N aura4 
+#SBATCH --partition=compute
+#SBATCH --ntasks=576
+#SBATCH --time=06:00:00 
+
+setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
+setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 
+
+setenv CHEMCASE strat_trop
+
+cd $workDir
+
+setenv MPI_MEMMAP_OFF
+unsetenv MPI_NUM_MEMORY_REGIONS
+setenv MPI_XPMEM_ENABLED yes
+unsetenv SUPPRESS_XPMEM_TRIM_THRESH
+setenv I_MPI_SHM_HEAP_VSIZE 4096
+
+module purge
+module load comp/gcc/6.5.0
+module load comp/intel/18.0.5.274
+module load mpi/sgi-mpt/2.17
+module load python/GEOSpyD/Ana2019.10_py2.7
+
+
+setenv BASEDIR /discover/swdev/gmao_SIteam/Baselibs/ESMA-Baselibs-6.0.4-SLES12/x86_64-unknown-linux-gnu/ifort_18.0.5.274-mpt_2.17
+
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:$BASEDIR/Linux/lib
+
+cp namelist.list gmiResourceFile.rc
+limit stacksize unlimited
+
+echo " GMI CTM segment is starting " | mail -s "GMI production segment starting" megandamon@gmail.com
+
+time mpiexec_mpt 
