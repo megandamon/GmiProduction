@@ -4,6 +4,8 @@
 #SBATCH --partition=compute
 #SBATCH --ntasks=576
 #SBATCH --time=06:00:00 
+#SBATCH --dependency=afterany:0000
+
 
 setenv workDir /discover/nobackup/mrdamon/GMI_runs/Aura4
 setenv GEMHOME /discover/nobackup/mrdamon/GMI_source/Aura4-ReRun/gmi_gsfc/Applications/GmiBin 

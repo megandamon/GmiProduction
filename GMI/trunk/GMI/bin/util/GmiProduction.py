@@ -168,12 +168,12 @@ class GmiProduction:
 #            fileLines [lineCounter] = "#PBS -W group_list=" + chargeCode
 #        elif re.search ("#PBS -W depend", line):
          elif re.search ("#SBATCH --depend", line):
-            print "found depend line"
+            print "Found job dependency line in qsub file... "
             if lastJobId != None:
-               print "job id is not none"
+               print "Updating dependency with: ", lastJobId
                fileLines [lineCounter] = "#SBATCH --dependency=afterany:" + lastJobId         
             else:
-               print "IN ELSE"
+               print "Did not find a job id; will submit without dependencies"
                fileLines [lineCounter] = ""
          elif re.search ("CHEMCASE", line):
             fileLines [lineCounter] = "setenv CHEMCASE " + chemicalMechanism

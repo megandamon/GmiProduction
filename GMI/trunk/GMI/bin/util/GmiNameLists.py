@@ -427,8 +427,18 @@ class GmiNameLists:
             elif keyWord == 'lbssad_infile_name' and \
                     matchSadToYear == True:
                 print "changing lbssad"
-                splitLbssad = re.split("_", value) 
-                newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + startymd[0:4] + ".nc"
+                splitLbssad = re.split("_", value)
+                # 0 /discover/nobackup/projects/gmi/gmidata2/input/chemistry/surfareadens/CMIP6/sad_
+                # 1 wt_
+                # 2 CMIP6_
+                # 3 1x72_
+                # 4 2005.nc
+                if len(splitLbssad) == 5:
+                    print ("Found 5 lbssad tokens!")
+                    newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + \
+                                splitLbssad[3]+ "_" + startymd[0:4] + ".nc"
+                else:
+                    newLbssad = splitLbssad[0] + "_" + splitLbssad[1] + "_" + splitLbssad[2] + "_" + startymd[0:4] + ".nc"
                 ofil.write('lbssad_infile_name' + splitter + newLbssad + endLine)   
 
             elif keyWord == 'emiss_infile_name' and \

@@ -113,6 +113,8 @@ class RemoteSystemTools:
       cmdOut, cmdErr = subProcess.communicate()
       # stdout has some junk chars before the jobId, so just split out the last word
       jobString = cmdOut.split()[-1]
+      print "job id: ", jobString
+
       #processOutput = subProcess.read()
       #closeReturn = subProcess.close ()
       #if closeReturn != None:
@@ -133,15 +135,16 @@ class RemoteSystemTools:
       newEntry = jobId + ", " + realUser + "\n"
       
       # add job id to workflow env file
+      print "Trying to write new job id to file.."
       try:
-
-         wkEnvFileHandle = open (workflowEnvFile, 'a')
-         wkEnvFileHandle.write ('#Model segment job ID\n')
-         newJobId = jobId.replace ('.pbsa1', '')
-         wkEnvFileHandle.write ('export jobID=' + newJobId + '\n')
-         wkEnvFileHandle.close ()
+          print "In try"
+          wkEnvFileHandle = open (workflowEnvFile, 'a')
+          wkEnvFileHandle.write ('#Model segment job ID\n')
+          newJobId = jobId.replace ('.pbsa1', '')
+          wkEnvFileHandle.write ('export jobID=' + newJobId + '\n')
+          wkEnvFileHandle.close ()
       except:
-         raise IO_ERROR
+          raise IO_ERROR
 
       # if ned user and the real user are not the same, 
       # do the accounting
